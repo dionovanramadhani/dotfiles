@@ -1,0 +1,111 @@
+/* Rofi Calendar Theme — Gruvbox Dark */
+
+* {
+    bg0:        #282828;
+    bg1:        #3c3836;
+    bg2:        #504945;
+    fg0:        #fbf1c7;
+    fg1:        #ebdbb2;
+
+    gruvyellow: #fabd2f;
+    gruvaqua:   #8ec07c;
+    gruvorange: #fe8019;
+
+    background-color: #282828;
+    text-color:       #ebdbb2;
+    border:    0;
+    margin:    0;
+    padding:   0;
+    spacing:   0;
+}
+
+window {
+    /* Lebar disesuaikan agar 35-char content (JetBrainsMono 10) memenuhi area */
+    width:            340px;
+    background-color: #282828;
+    border:           2px;
+    border-color:     #fabd2f;
+    border-radius:    12px;
+    padding:          0px;
+}
+
+mainbox {
+    background-color: transparent;
+    children:         [ listview ];
+    padding:          10px 6px;
+    spacing:          0px;
+}
+
+inputbar {
+    enabled: false;
+}
+
+listview {
+    background-color: transparent;
+    lines:            13;
+    columns:          1;
+    spacing:          0px;
+    scrollbar:        false;
+    border:           0px;
+    padding:          0px;
+    fixed-height:     false;
+    dynamic:          true;
+}
+
+/* Semua baris kalender */
+element {
+    background-color: transparent;
+    text-color:       #ebdbb2;
+    padding:          2px 4px;
+    border-radius:    4px;
+    cursor:           default;
+    orientation:      horizontal;
+    spacing:          0px;
+    expand:           true;
+}
+
+element.normal.normal {
+    background-color: transparent;
+    text-color:       #ebdbb2;
+}
+
+/* Baris yang di-hover (tapi bukan navigasi) */
+element.selected.normal {
+    background-color: transparent;
+    text-color:       #ebdbb2;
+}
+
+/* Baris navigasi ◀ ▶ ⟳ */
+element.normal.urgent {
+    background-color: transparent;
+    text-color:       #8ec07c;
+    cursor:           pointer;
+}
+
+element.selected.urgent {
+    background-color: #504945;
+    text-color:       #8ec07c;
+    border-radius:    6px;
+}
+
+/* Header baris (📅 bulan tahun) pakai active */
+element.normal.active {
+    background-color: #3c3836;
+    text-color:       #fabd2f;
+    border-radius:    8px 8px 0px 0px;
+}
+
+element.selected.active {
+    background-color: #3c3836;
+    text-color:       #fabd2f;
+}
+
+element-text {
+    background-color: transparent;
+    text-color:       inherit;
+    vertical-align:   0.5;
+    horizontal-align: 0.0;
+    expand:           true;
+    font:             "JetBrainsMono Nerd Font Bold 10";
+    highlight:        bold;
+}

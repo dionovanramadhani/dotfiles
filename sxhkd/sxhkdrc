@@ -1,0 +1,223 @@
+#
+# wm independent hotkeys
+#
+
+# terminal emulator
+alt + Return
+	alacritty
+
+# program launcher
+super + space
+	rofi -show drun
+
+# make sxhkd reload its configuration files:
+super + Escape
+	pkill -USR1 -x sxhkd
+
+#
+# bspwm hotkeys
+#
+
+# quit/restart bspwm
+super + alt + {q,r}
+	bspc {quit,wm -r}
+
+# close and kill
+super + {_,shift + }q
+	bspc node -{c,k}
+
+# alternate between the tiled and monocle layout
+alt + m
+	bspc desktop -l next
+
+# send the newest marked node to the newest preselected node
+super + y
+	bspc node newest.marked.local -n newest.!automatic.local
+
+# swap the current node and the biggest window
+super + g
+	bspc node -s biggest.window
+
+#
+# state/flags
+#
+
+# set the window state
+super + {t,shift + t,s,f}
+	bspc node -t {tiled,pseudo_tiled,floating,fullscreen}
+
+# set the node flags
+super + ctrl + {m,x,y,z}
+	bspc node -g {marked,locked,sticky,private}
+
+#
+# focus/swap
+#
+
+# focus the node in the given direction
+super + {_,shift + }{Left,Down,Up,Right}
+	bspc node -{f,s} {west,south,north,east}
+
+# focus the node for the given path jump
+super + {p,b,comma,period}
+	bspc node -f @{parent,brother,first,second}
+
+# focus the next/previous window in the current desktop
+super + {_,shift + }c
+	bspc node -f {next,prev}.local.!hidden.window
+
+# focus the next/previous window in monocle layout
+alt + c
+	bspc node -f next.local.!hidden.window
+alt + z
+	bspc node -f prev.local.!hidden.window
+
+# focus the next/previous desktop in the current monitor
+super + bracket{left,right}
+	bspc desktop -f {prev,next}.local
+
+# focus the next/previous desktop in the current monitor (alt + [ / ])
+alt + bracket{left,right}
+	bspc desktop -f {prev,next}.local
+
+# focus the last node/desktop
+super + {grave,Tab}
+	bspc {node,desktop} -f last
+
+# focus the older or newer node in the focus history
+super + {o,i}
+	bspc wm -h off; \
+	bspc node {older,newer} -f; \
+	bspc wm -h on
+
+# focus or send to the given desktop
+alt + {_,shift + }{1-9,0}
+	bspc {desktop -f,node -d} '^{1-9,10}'
+
+#
+# preselect
+#
+
+# preselect the direction
+super + ctrl + {h,j,k,l}
+	bspc node -p {west,south,north,east}
+
+# preselect the ratio
+super + ctrl + {1-9}
+	bspc node -o 0.{1-9}
+
+# cancel the preselection for the focused node
+super + ctrl + space
+	bspc node -p cancel
+
+# cancel the preselection for the focused desktop
+super + ctrl + shift + space
+	bspc query -N -d | xargs -I id -n 1 bspc node id -p cancel
+
+#
+# move/resize
+#
+
+# expand a window by moving one of its side outward
+super + alt + {h,j,k,l}
+	bspc node -z {left -20 0,bottom 0 20,top 0 -20,right 20 0}
+
+# contract a window by moving one of its side inward
+super + alt + shift + {h,j,k,l}
+	bspc node -z {right -20 0,top 0 20,bottom 0 -20,left 20 0}
+
+# move a floating window
+super + {Left,Down,Up,Right}
+	bspc node -v {-20 0,0 20,0 -20,20 0}
+
+
+# Close active window
+super + q
+	bspc window -c
+
+# Volume Up
+XF86AudioRaiseVolume
+    amixer -q set Master 5%+
+
+# Volume Down
+XF86AudioLowerVolume
+    amixer -q set Master 5%-
+
+# Mute / Unmute Volume
+XF86AudioMute
+    amixer -q set Master toggle
+
+# 1. Menukar posisi window aktif dengan window di arah tertentu (Swap)
+super + shift + {Left,Down,Up,Right}
+	bspc node -s {west,south,north,east}
+
+# 2. Memindahkan window aktif ke monitor sebelah (DP-0 <-> HDMI-0)
+super + alt + {Left,Right}
+	bspc node -m {prev,next} --follow
+
+# Mengubah window menjadi melayang (Floating)
+super + alt + f
+	bspc node -t floating
+
+# Mengembalikan window menjadi ubin kembali (Tiled)
+super + alt + t
+	bspc node -t tiled
+
+
+# Mengubah ukuran jendela (Resize) menggunakan kombinasi Alt + Super + Panah
+alt + shift + {Left,Down,Up,Right}
+	bspc node -z {left -20 0,bottom 0 20,top 0 -20,right 20 0}
+# Mengurangi ukuran jendela (Shrink) menggunakan kombinasi Alt + Super + Shift + Panah
+alt + super + shift + {Left,Down,Up,Right}
+	bspc node -z {right -20 0,top 0 20,bottom 0 -20,left 20 0}
+
+
+super + x
+	~/.local/bin/powermenu.sh
+
+super + h
+  helium
+
+alt + s
+  spotify
+
+# Open helium browser
+alt + b
+	helium
+
+# Close active window
+ctrl + q
+	bspc node -c
+
+# Open thunar file manager
+alt + o
+	thunar
+
+# Open discord
+alt + d
+	discord
+
+# Open WhatsApp Web
+alt + w
+	helium --app=https://web.whatsapp.com
+
+# Toggle window floating and tiled state
+alt + f
+	bspc query -N -n focused.floating > /dev/null && bspc node -t tiled || bspc node -t floating
+
+# Open wallpaper menu
+super + w
+	~/.local/bin/wallpaper_menu.sh
+
+Print
+  F=~/Pictures/Screenshots/Screenshot_$(date +%Y-%m-%d_%H-%M-%S).png; maim -u "$F" && xclip -selection clipboard -t image/png -i "$F"
+
+super + shift + s
+  maim -s -u | xclip -selection clipboard -t image/png
+
+
+alt + Print
+    F=~/Pictures/Screenshots/Window_$(date +%Y-%m-%d_%H-%M-%S).png; maim -i $(xdotool getactivewindow) "$F" && xclip -selection clipboard -t image/png -i "$F"
+
+alt + shift + c
+    alacritty --class floating_cal -e calcurse
