@@ -6,27 +6,27 @@
 local M = {}
 
 M.base46 = {
-	theme = "gruvbox",
+  theme = "gruvbox",
 
-	changed_themes = {
-		gruvbox = {
-			base_30 = {
-				black = "#1d2021",
-				darker_black = "#181a1b",
-				black2 = "#222526",
-			},
-			base_16 = {
-				base00 = "#1d2021",
-			},
-		},
-	},
+  changed_themes = {
+    gruvbox = {
+      base_30 = {
+        black = "#1d2021",
+        darker_black = "#181a1b",
+        black2 = "#222526",
+      },
+      base_16 = {
+        base00 = "#1d2021",
+      },
+    },
+  },
 
-	hl_override = {
-		LspReferenceText = { bg = "#3c3836", underline = true },
-		LspReferenceRead = { bg = "#3c3836", underline = true },
-		LspReferenceWrite = { bg = "#3c3836", underline = true, bold = true },
-		IblScopeChar = { fg = "#ffffff" },
-	},
+  hl_override = {
+    LspReferenceText = { bg = "#3c3836", underline = true },
+    LspReferenceRead = { bg = "#3c3836", underline = true },
+    LspReferenceWrite = { bg = "#3c3836", underline = true, bold = true },
+    IblScopeChar = { fg = "#ffffff" },
+  },
 }
 
 M.term = {
@@ -41,17 +41,17 @@ M.term = {
 M.nvdash = {
   load_on_startup = true,
   header = {
-    "▄▀█ █▀▄▀█ ██▄ ▄▀█ ▀█▀ █ █ ▄▀▀ ▄▀▀▄ █▀▄ █▀▀",
-    "█▀█ █ ▀ █ █▄█ █▀█  █  █▄█ ▀▄▄ ▀▄▄▀ █▄▀ █▄▄",
-    "",
-    "",
-    "",
+    "__     ______   ____ ___  ____  _____ ",
+    "\\ \\   / / ___| / ___/ _ \\|  _ \\| ____|",
+    " \\ \\ / /\\___ \\| |  | | | | | | |  _|  ",
+    "  \\ V /  ___) | |__| |_| | |_| | |___ ",
+    "   \\_/  |____/ \\____\\___/|____/|_____|",
   },
 }
 
 M.ui = {
   tabufline = {
-    lazyload = false,
+    enabled = false,
   },
 }
 
