@@ -4,6 +4,20 @@ M.setup = function()
   local ok, utils = pcall(require, "nvchad.tabufline.utils")
   if not ok then return end
 
+  -- Load tbline cache if it exists, since we disabled nvchad's default tabufline
+  local function load_tbline_hl()
+    if vim.g.base46_cache then
+      pcall(dofile, vim.g.base46_cache .. "tbline")
+    end
+  end
+
+  load_tbline_hl()
+
+  -- Reload tbline cache whenever colorscheme changes to prevent highlights being cleared
+  vim.api.nvim_create_autocmd("ColorScheme", {
+    callback = load_tbline_hl,
+  })
+
   local api = vim.api
   local get_opt = api.nvim_get_option_value
   local strep = string.rep
@@ -19,8 +33,8 @@ M.setup = function()
   end
 
   local function new_hl(group1, group2)
-    local fg = get_hl(0, { name = group1 }).fg
-    local bg = get_hl(0, { name = "Tb" .. group2 }).bg
+    local fg = get_hl(0, { name = group1, link = false }).fg
+    local bg = get_hl(0, { name = "Tb" .. group2, link = false }).bg
     api.nvim_set_hl(0, group1 .. group2, { fg = fg, bg = bg })
     return "%#" .. group1 .. group2 .. "#"
   end
@@ -38,7 +52,7 @@ M.setup = function()
   local function get_custom_buf_hl(suffix, is_curbuf, color_fg)
     local base_group = "TbBufO" .. (is_curbuf and "n" or "ff")
     local hl_name = base_group .. suffix
-    local bg_color = get_hl(0, { name = base_group }).bg
+    local bg_color = get_hl(0, { name = base_group, link = false }).bg
     api.nvim_set_hl(0, hl_name, { fg = color_fg, bg = bg_color })
     return "BufO" .. (is_curbuf and "n" or "ff") .. suffix
   end
@@ -68,20 +82,43 @@ M.setup = function()
       has_error = true
     end
 
+    local is_modified = false
+    local is_untracked = false
+
+    -- Check gitsigns cache first for untracked and modified status
+    local ok_cache, cache_mod = pcall(require, "gitsigns.cache")
+    if ok_cache and cache_mod and cache_mod.cache then
+      local bcache = cache_mod.cache[nr]
+      if bcache then
+        if bcache.git_obj and bcache.git_obj.object_name == nil then
+          is_untracked = true
+        elseif bcache.hunks and #bcache.hunks > 0 then
+          is_modified = true
+        end
+      end
+    end
+
+    -- Fallback to gitsigns_status_dict if cache is not available
     local git_status = vim.b[nr].gitsigns_status_dict
+    if git_status and not is_untracked and not is_modified then
+      if (git_status.changed and git_status.changed > 0) or (git_status.removed and git_status.removed > 0) then
+        is_modified = true
+      elseif git_status.added and git_status.added > 0 then
+        is_untracked = true
+      end
+    end
+
     local text_hl_name = tbHlName
 
     if has_error then
-      local err_fg = (get_hl(0, { name = "DiagnosticError" }) or {}).fg or 16468276 -- default red
+      local err_fg = (get_hl(0, { name = "DiagnosticError", link = false }) or {}).fg or 16468276 -- default red
       text_hl_name = get_custom_buf_hl("Error", is_curbuf, err_fg)
-    elseif git_status then
-      if (git_status.changed and git_status.changed > 0) or (git_status.removed and git_status.removed > 0) then
-        local mod_fg = (get_hl(0, { name = "GitSignsChange" }) or {}).fg or 16432431 -- default yellow
-        text_hl_name = get_custom_buf_hl("GitMod", is_curbuf, mod_fg)
-      elseif git_status.added and git_status.added > 0 then
-        local add_fg = (get_hl(0, { name = "GitSignsAdd" }) or {}).fg or 12106534 -- default green
-        text_hl_name = get_custom_buf_hl("GitAdd", is_curbuf, add_fg)
-      end
+    elseif is_untracked then
+      local add_fg = (get_hl(0, { name = "GitSignsAdd", link = false }) or {}).fg or 12106534 -- default green
+      text_hl_name = get_custom_buf_hl("GitAdd", is_curbuf, add_fg)
+    elseif is_modified then
+      local mod_fg = (get_hl(0, { name = "GitSignsChange", link = false }) or {}).fg or 16432431 -- default yellow
+      text_hl_name = get_custom_buf_hl("GitMod", is_curbuf, mod_fg)
     end
 
     -- padding around bufname; 15= maxnamelen + 2 icon & space + 2 close icon
@@ -126,6 +163,9 @@ M.setup = function()
       vim.cmd("redrawtabline")
     end,
   })
+
+  -- Force reload tabline module to apply the override
+  package.loaded["nvchad.tabufline.modules"] = nil
 end
 
 return M

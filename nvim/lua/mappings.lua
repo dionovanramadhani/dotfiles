@@ -59,28 +59,28 @@ map({ "n", "i", "v" }, "<C-n>", "<cmd>enew | startinsert<CR>", { desc = "New fil
 
 -- Close editor/buffer
 map({ "n", "i", "v" }, "<C-w>", function()
-  require("nvchad.tabufline").close_buffer()
+  vim.cmd("WinBufClose")
 end, { desc = "Close buffer", nowait = true })
 
 map({ "n", "i", "v" }, "<C-F4>", function()
-  require("nvchad.tabufline").close_buffer()
+  vim.cmd("WinBufClose")
 end, { desc = "Close buffer" })
 
 -- Switch Tab/Buffer
 map({ "n", "i", "v" }, "<C-Tab>", function()
-  require("nvchad.tabufline").next()
+  vim.cmd("WinBufNext")
 end, { desc = "Next buffer" })
 
 map({ "n", "i", "v" }, "<C-PageDown>", function()
-  require("nvchad.tabufline").next()
+  vim.cmd("WinBufNext")
 end, { desc = "Next buffer" })
 
 map({ "n", "i", "v" }, "<C-S-Tab>", function()
-  require("nvchad.tabufline").prev()
+  vim.cmd("WinBufPrev")
 end, { desc = "Previous buffer" })
 
 map({ "n", "i", "v" }, "<C-PageUp>", function()
-  require("nvchad.tabufline").prev()
+  vim.cmd("WinBufPrev")
 end, { desc = "Previous buffer" })
 
 -- Split Editor
@@ -98,6 +98,12 @@ map("n", "<C-S-Left>", "<C-w>H", { desc = "Move window left" })
 map("n", "<C-S-Down>", "<C-w>J", { desc = "Move window down" })
 map("n", "<C-S-Up>", "<C-w>K", { desc = "Move window up" })
 map("n", "<C-S-Right>", "<C-w>L", { desc = "Move window right" })
+
+-- Move current buffer to adjacent splits (Ctrl + Alt + Shift + Arrows)
+map("n", "<C-A-S-Left>", "<cmd>WinBufMoveLeft<CR>", { desc = "Move buffer left" })
+map("n", "<C-A-S-Down>", "<cmd>WinBufMoveDown<CR>", { desc = "Move buffer down" })
+map("n", "<C-A-S-Up>", "<cmd>WinBufMoveUp<CR>", { desc = "Move buffer up" })
+map("n", "<C-A-S-Right>", "<cmd>WinBufMoveRight<CR>", { desc = "Move buffer right" })
 
 
 -- 2. Editing & Navigation
@@ -534,11 +540,11 @@ map("n", "I", "3<C-y>", { desc = "Scroll viewport up" })
 
 -- Tab / Buffer Navigation (VS Code / Web Browser style)
 local function next_tab()
-  require("nvchad.tabufline").next()
+  vim.cmd("WinBufNext")
 end
 
 local function prev_tab()
-  require("nvchad.tabufline").prev()
+  vim.cmd("WinBufPrev")
 end
 
 -- 1. Ctrl + Alt + Arrow Left/Right (Linux style tab switching - insert, visual, terminal mode only to prevent normal mode window navigation conflict)
@@ -552,3 +558,52 @@ map({ "n", "i", "v", "t" }, "<C-S-[>", prev_tab, { desc = "Go to previous tab" }
 -- 3. Ctrl + Tab / Ctrl + Shift + Tab
 map({ "n", "i", "v", "t" }, "<C-Tab>", next_tab, { desc = "Go to next tab" })
 map({ "n", "i", "v", "t" }, "<C-S-Tab>", prev_tab, { desc = "Go to previous tab" })
+
+-- 5. Visual Mode Wrapping (Wrap selection with brackets or quotes)
+local function wrap_selection(open_bracket, close_bracket)
+  local unnamed_val = vim.fn.getreg('"')
+  local unnamed_type = vim.fn.getregtype('"')
+  local z_val = vim.fn.getreg('z')
+  local z_type = vim.fn.getregtype('z')
+
+  -- Yank current selection to register z
+  vim.cmd('normal! "zy')
+
+  local reg_val = vim.fn.getreg('z')
+  local reg_type = vim.fn.getregtype('z')
+  local new_val = ""
+
+  if reg_type:sub(1, 1) == "\22" then -- Blockwise visual selection (<C-v>)
+    local lines = vim.split(reg_val, "\n")
+    for i, line in ipairs(lines) do
+      if line ~= "" or i < #lines then
+        lines[i] = open_bracket .. line .. close_bracket
+      end
+    end
+    new_val = table.concat(lines, "\n")
+  elseif reg_type == "V" then -- Linewise visual selection (V)
+    new_val = open_bracket .. "\n" .. reg_val .. close_bracket .. "\n"
+  else -- Characterwise visual selection (v)
+    new_val = open_bracket .. reg_val .. close_bracket
+  end
+
+  vim.fn.setreg('z', new_val, reg_type)
+  -- Paste back over selection using P (to not clobber unnamed register)
+  vim.cmd('normal! gv"zP')
+
+  -- Restore original register values
+  vim.fn.setreg('"', unnamed_val, unnamed_type)
+  vim.fn.setreg('z', z_val, z_type)
+end
+
+-- Keymaps for wrapping in Visual Mode
+map("v", "{", function() wrap_selection("{", "}") end, { desc = "Wrap with curly brackets" })
+map("v", "}", function() wrap_selection("{", "}") end, { desc = "Wrap with curly brackets" })
+map("v", "[", function() wrap_selection("[", "]") end, { desc = "Wrap with square brackets" })
+map("v", "]", function() wrap_selection("[", "]") end, { desc = "Wrap with square brackets" })
+map("v", "(", function() wrap_selection("(", ")") end, { desc = "Wrap with parentheses" })
+map("v", ")", function() wrap_selection("(", ")") end, { desc = "Wrap with parentheses" })
+map("v", '"', function() wrap_selection('"', '"') end, { desc = "Wrap with double quotes" })
+map("v", "'", function() wrap_selection("'", "'") end, { desc = "Wrap with single quotes" })
+map("v", "`", function() wrap_selection("`", "`") end, { desc = "Wrap with backticks" })
+
