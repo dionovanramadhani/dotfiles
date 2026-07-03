@@ -6,12 +6,56 @@ pcall(vim.keymap.del, "n", "<C-w><C-d>")
 
 local map = vim.keymap.set
 
+-- Custom function to toggle between Go to Definition and Find References
+_G.go_to_definition_or_references = function()
+  local clients = vim.lsp.get_clients({ bufnr = 0, method = "textDocument/definition" })
+  if vim.tbl_isempty(clients) then
+    vim.lsp.buf.definition()
+    return
+  end
+
+  local params = vim.lsp.util.make_position_params()
+  vim.lsp.buf_request(0, "textDocument/definition", params, function(err, result, ctx, config)
+    if err or not result or vim.tbl_isempty(result) then
+      vim.lsp.buf.definition()
+      return
+    end
+
+    local target = result
+    if vim.tbl_islist(result) then
+      target = result[1]
+    end
+
+    local target_uri = target.uri or target.targetUri
+    local target_range = target.range or target.targetSelectionRange
+
+    if not target_uri or not target_range then
+      vim.lsp.buf.definition()
+      return
+    end
+
+    local current_uri = vim.uri_from_bufnr(0)
+    local current_cursor = vim.api.nvim_win_get_cursor(0)
+    local current_row = current_cursor[1] - 1
+
+    local is_at_definition = (target_uri == current_uri) and (target_range.start.line == current_row)
+
+    if is_at_definition then
+      vim.lsp.buf.references()
+    else
+      local client = vim.lsp.get_client_by_id(ctx.client_id)
+      local offset_encoding = client and client.offset_encoding or "utf-16"
+      vim.lsp.util.jump_to_location(target, offset_encoding, true)
+    end
+  end)
+end
+
 -- 1. File & Buffer Operations
 -- Save file
 map({ "n", "i", "v" }, "<C-s>", "<cmd>w<CR>", { desc = "Save file" })
 
 -- New file
-map({ "n", "i", "v" }, "<C-n>", "<cmd>enew<CR>", { desc = "New file" })
+map({ "n", "i", "v" }, "<C-n>", "<cmd>enew | startinsert<CR>", { desc = "New file" })
 
 -- Close editor/buffer
 map({ "n", "i", "v" }, "<C-w>", function()
@@ -43,6 +87,18 @@ end, { desc = "Previous buffer" })
 map({ "n", "i", "v" }, "<C-\\>", "<cmd>vsplit<CR>", { desc = "Split vertically" })
 map({ "n", "i", "v" }, "<C-S-\\>", "<cmd>split<CR>", { desc = "Split horizontally" })
 
+-- Move focus between splits (Ctrl + Alt + Arrows)
+map("n", "<C-A-Left>", "<C-w>h", { desc = "Focus left window" })
+map("n", "<C-A-Down>", "<C-w>j", { desc = "Focus bottom window" })
+map("n", "<C-A-Up>", "<C-w>k", { desc = "Focus top window" })
+map("n", "<C-A-Right>", "<C-w>l", { desc = "Focus right window" })
+
+-- Move split window positions (Ctrl + Shift + Arrows)
+map("n", "<C-S-Left>", "<C-w>H", { desc = "Move window left" })
+map("n", "<C-S-Down>", "<C-w>J", { desc = "Move window down" })
+map("n", "<C-S-Up>", "<C-w>K", { desc = "Move window up" })
+map("n", "<C-S-Right>", "<C-w>L", { desc = "Move window right" })
+
 
 -- 2. Editing & Navigation
 -- Clipboard (Copy, Cut, Paste)
@@ -61,15 +117,32 @@ map("n", "<C-y>", "<C-r>", { desc = "Redo" })
 map("i", "<C-y>", "<Cmd>redo<CR>", { desc = "Redo" })
 map("v", "<C-y>", "<Cmd>redo<CR>", { desc = "Redo" })
 
--- Delete Word (Ctrl+Delete / Ctrl+Backspace)
-map("n", "<C-Delete>", "dw", { desc = "Delete word forward" })
-map("i", "<C-Delete>", "<C-o>dw", { desc = "Delete word forward" })
+-- Deletion (Linux style Ctrl + Backspace)
 map("n", "<C-Backspace>", "db", { desc = "Delete word backward" })
 map("i", "<C-Backspace>", "<C-w>", { desc = "Delete word backward" })
-map("i", "<C-H>", "<C-w>", { desc = "Delete word backward" })
+map("n", "<C-BS>", "db", { desc = "Delete word backward" })
+map("i", "<C-BS>", "<C-w>", { desc = "Delete word backward" })
+
+map("n", "<C-H>", "d0", { desc = "Delete to start of line" })
+map("i", "<C-H>", "<C-u>", { desc = "Delete to start of line" })
+
+map("n", "<C-Delete>", "dw", { desc = "Delete word forward" })
+map("i", "<C-Delete>", "<C-o>dw", { desc = "Delete word forward" })
 
 -- Select All
 map({ "n", "i", "v" }, "<C-a>", "<Esc>ggVG", { desc = "Select all" })
+
+-- Line Navigation (Linux style Ctrl + Left/Right)
+map({ "n", "v" }, "<C-Left>", "^", { desc = "Go to start of line" })
+map({ "n", "v" }, "<C-Right>", "$", { desc = "Go to end of line" })
+map("i", "<C-Left>", "<Home>", { desc = "Go to start of line" })
+map("i", "<C-Right>", "<End>", { desc = "Go to end of line" })
+
+-- Ctrl + Enter (New line below) and Shift + Enter (Add semicolon at end of line)
+map("n", "<C-CR>", "o", { desc = "New line below" })
+map("i", "<C-CR>", "<Esc>o", { desc = "New line below" })
+map("n", "<S-CR>", "A;<Esc>", { desc = "Add semicolon to end of line" })
+map("i", "<S-CR>", "<Esc>A;<Esc>a", { desc = "Add semicolon to end of line" })
 
 -- Move Lines
 map("n", "<A-Up>", "<cmd>m .-2<CR>===", { desc = "Move line up" })
@@ -110,12 +183,64 @@ map("i", "<C-S-k>", "<Esc>ddi", { desc = "Delete line" })
 -- Quick Open / Go to file
 map({ "n", "i", "v" }, "<C-p>", "<cmd>Telescope find_files<CR>", { desc = "Search files (Quick open)" })
 
+-- Helper function to get visual/select mode selected text
+local function get_visual_selection()
+  local type_map = {
+    s = "v",
+    S = "V",
+    ["\19"] = "\22",
+    v = "v",
+    V = "V",
+    ["\22"] = "\22",
+  }
+  local raw_mode = vim.fn.mode()
+  local mode_type = type_map[raw_mode] or "v"
+  local s_pos = vim.fn.getpos("v")
+  local e_pos = vim.fn.getpos(".")
+  local region = vim.fn.getregion(s_pos, e_pos, { type = mode_type })
+  return table.concat(region, "\n")
+end
+
+local function search_in_file()
+  local mode = vim.fn.mode()
+  local text = ""
+  if mode == "v" or mode == "V" or mode == "\22" or mode == "s" or mode == "S" or mode == "\19" then
+    text = get_visual_selection()
+    vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<Esc>", true, false, true), "nx", false)
+  else
+    text = vim.fn.expand("<cword>")
+  end
+  require("telescope.builtin").current_buffer_fuzzy_find({ default_text = text })
+end
+
+local function search_in_project()
+  local mode = vim.fn.mode()
+  local text = ""
+  if mode == "v" or mode == "V" or mode == "\22" or mode == "s" or mode == "S" or mode == "\19" then
+    text = get_visual_selection()
+    vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<Esc>", true, false, true), "nx", false)
+  else
+    text = vim.fn.expand("<cword>")
+  end
+  require("telescope.builtin").live_grep({ default_text = text })
+end
+
 -- Find in current file
-map({ "n", "i", "v" }, "<C-f>", "<cmd>Telescope current_buffer_fuzzy_find<CR>", { desc = "Search in file" })
+map({ "n", "x", "s" }, "<C-f>", search_in_file, { desc = "Search in file" })
+map("i", "<C-f>", function()
+  require("telescope.builtin").current_buffer_fuzzy_find({ default_text = vim.fn.expand("<cword>") })
+end, { desc = "Search in file" })
 
 -- Global search (Search in project)
-map({ "n", "i", "v" }, "<C-S-f>", "<cmd>Telescope live_grep<CR>", { desc = "Search in project" })
-map({ "n", "i", "v" }, "<C-S-F>", "<cmd>Telescope live_grep<CR>", { desc = "Search in project" })
+map({ "n", "x", "s" }, "<C-S-f>", search_in_project, { desc = "Search in project" })
+map({ "n", "x", "s" }, "<C-S-F>", search_in_project, { desc = "Search in project" })
+map("i", "<C-S-f>", function()
+  require("telescope.builtin").live_grep({ default_text = vim.fn.expand("<cword>") })
+end, { desc = "Search in project" })
+map("i", "<C-S-F>", function()
+  require("telescope.builtin").live_grep({ default_text = vim.fn.expand("<cword>") })
+end, { desc = "Search in project" })
+
 map({ "n", "i", "v" }, "<A-S-f>", "<cmd>Telescope live_grep<CR>", { desc = "Search in project (Alternative)" })
 map({ "n", "i", "v" }, "<A-S-F>", "<cmd>Telescope live_grep<CR>", { desc = "Search in project (Alternative)" })
 
@@ -193,14 +318,20 @@ map("i", "<C-_>", toggle_comment_insert, { desc = "Toggle comment" })
 -- Go to line number
 map({ "n", "i", "v" }, "<C-g>", ":", { desc = "Go to line" })
 
--- Go back / forward in cursor history
-map("n", "<A-Left>", "<C-o>", { desc = "Go back in history" })
-map("n", "<A-Right>", "<C-i>", { desc = "Go forward in history" })
+-- Go back / forward in cursor history (macOS style Cmd + [ / ])
+map("n", "<C-[>", "<C-o>", { desc = "Go back in history" })
+map("n", "<C-]>", "<C-i>", { desc = "Go forward in history" })
+
+-- Option/Alt + Arrow keys for word-by-word navigation (macOS style)
+map({ "n", "v" }, "<A-Left>", "b", { desc = "Move word backward" })
+map({ "n", "v" }, "<A-Right>", "w", { desc = "Move word forward" })
+map("i", "<A-Left>", "<C-o>b", { desc = "Move word backward" })
+map("i", "<A-Right>", "<C-o>w", { desc = "Move word forward" })
 
 -- LSP Navigation & Code actions
-map("n", "<F12>", vim.lsp.buf.definition, { desc = "Go to definition" })
-map("n", "<C-LeftMouse>", "<LeftMouse><cmd>lua vim.lsp.buf.definition()<CR>", { desc = "Go to definition" })
-map("i", "<C-LeftMouse>", "<Esc><LeftMouse><cmd>lua vim.lsp.buf.definition()<CR>", { desc = "Go to definition" })
+map("n", "<F12>", function() _G.go_to_definition_or_references() end, { desc = "Go to definition or references" })
+map("n", "<C-LeftMouse>", "<LeftMouse><cmd>lua _G.go_to_definition_or_references()<CR>", { desc = "Go to definition or references" })
+map("i", "<C-LeftMouse>", "<Esc><LeftMouse><cmd>lua _G.go_to_definition_or_references()<CR>", { desc = "Go to definition or references" })
 map("n", "<S-F12>", vim.lsp.buf.references, { desc = "Find references" })
 map({ "n", "i", "v" }, "<A-S-f>", function()
   require("conform").format { lsp_fallback = true }
@@ -326,3 +457,98 @@ local function preview_image()
 end
 
 map("n", "<leader>p", preview_image, { desc = "Preview image under cursor / in NvimTree" })
+
+-- Toggle Antigravity CLI in a vertical terminal split on the right (Cmd + L)
+local function toggle_antigravity_cli()
+  local agy_win = nil
+  local agy_buf = nil
+
+  -- Find an active agy terminal buffer that is still running
+  for _, buf in ipairs(vim.api.nvim_list_bufs()) do
+    if vim.api.nvim_buf_is_valid(buf) then
+      local name = vim.api.nvim_buf_get_name(buf)
+      local is_running = pcall(function() return vim.bo[buf].channel > 0 end) and vim.bo[buf].channel > 0
+      if name:match("term://.*agy") and is_running then
+        agy_buf = buf
+        break
+      end
+    end
+  end
+
+  -- Check if the buffer is visible in any window of the current tabpage
+  if agy_buf then
+    for _, win in ipairs(vim.api.nvim_tabpage_list_wins(0)) do
+      if vim.api.nvim_win_is_valid(win) and vim.api.nvim_win_get_buf(win) == agy_buf then
+        agy_win = win
+        break
+      end
+    end
+  end
+
+  if agy_win then
+    -- Close the window to hide it
+    vim.api.nvim_win_close(agy_win, true)
+  else
+    -- Open a vertical split on the right and switch to the agy buffer/terminal
+    local width = math.floor(vim.o.columns * 0.30)
+    vim.cmd("botright " .. width .. "vsplit")
+    if agy_buf and vim.api.nvim_buf_is_valid(agy_buf) then
+      vim.api.nvim_set_current_buf(agy_buf)
+    else
+      vim.cmd("terminal " .. vim.fn.expand("~/.local/bin/agy"))
+    end
+    vim.cmd("startinsert")
+  end
+end
+
+map({ "n", "i", "v", "t" }, "<C-l>", toggle_antigravity_cli, { desc = "Toggle Antigravity CLI on the right" })
+
+-- Toggle Neogit (VS Code style Source Control) in a 30% width vertical split
+local function toggle_neogit()
+  local neogit_win = nil
+  for _, win in ipairs(vim.api.nvim_tabpage_list_wins(0)) do
+    if vim.api.nvim_win_is_valid(win) then
+      local buf = vim.api.nvim_win_get_buf(win)
+      if vim.bo[buf].filetype == "NeogitStatus" then
+        neogit_win = win
+        break
+      end
+    end
+  end
+
+  if neogit_win then
+    vim.api.nvim_win_close(neogit_win, true)
+  else
+    vim.cmd("Neogit")
+    local width = math.floor(vim.o.columns * 0.30)
+    vim.cmd("vertical resize " .. width)
+  end
+end
+
+map({ "n", "i", "v", "t" }, "<C-S-g>", toggle_neogit, { desc = "Toggle Source Control" })
+map({ "n", "i", "v", "t" }, "<C-S-G>", toggle_neogit, { desc = "Toggle Source Control" })
+
+-- Scroll viewport using Shift + K (down) and Shift + I (up) in Normal Mode (kecepatan 3 baris)
+map("n", "K", "3<C-e>", { desc = "Scroll viewport down" })
+map("n", "I", "3<C-y>", { desc = "Scroll viewport up" })
+
+-- Tab / Buffer Navigation (VS Code / Web Browser style)
+local function next_tab()
+  require("nvchad.tabufline").next()
+end
+
+local function prev_tab()
+  require("nvchad.tabufline").prev()
+end
+
+-- 1. Ctrl + Alt + Arrow Left/Right (Linux style tab switching - insert, visual, terminal mode only to prevent normal mode window navigation conflict)
+map({ "i", "v", "t" }, "<C-M-Right>", next_tab, { desc = "Go to next tab" })
+map({ "i", "v", "t" }, "<C-M-Left>", prev_tab, { desc = "Go to previous tab" })
+
+-- 2. Ctrl + Shift + [ / ] (Alternative browser style)
+map({ "n", "i", "v", "t" }, "<C-S-]>", next_tab, { desc = "Go to next tab" })
+map({ "n", "i", "v", "t" }, "<C-S-[>", prev_tab, { desc = "Go to previous tab" })
+
+-- 3. Ctrl + Tab / Ctrl + Shift + Tab
+map({ "n", "i", "v", "t" }, "<C-Tab>", next_tab, { desc = "Go to next tab" })
+map({ "n", "i", "v", "t" }, "<C-S-Tab>", prev_tab, { desc = "Go to previous tab" })

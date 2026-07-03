@@ -42,5 +42,5 @@ vim.lsp.config("eslint", {
   ),
 })
 
-local servers = { "html", "cssls", "ts_ls", "tailwindcss", "emmet_language_server", "eslint" }
+local servers = { "html", "cssls", "ts_ls", "tailwindcss", "emmet_language_server", "eslint", "prismals" }
 vim.lsp.enable(servers)

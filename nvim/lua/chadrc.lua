@@ -8,11 +8,24 @@ local M = {}
 M.base46 = {
 	theme = "gruvbox",
 
+	changed_themes = {
+		gruvbox = {
+			base_30 = {
+				black = "#1d2021",
+				darker_black = "#181a1b",
+				black2 = "#222526",
+			},
+			base_16 = {
+				base00 = "#1d2021",
+			},
+		},
+	},
+
 	hl_override = {
 		LspReferenceText = { bg = "#3c3836", underline = true },
 		LspReferenceRead = { bg = "#3c3836", underline = true },
 		LspReferenceWrite = { bg = "#3c3836", underline = true, bold = true },
-		IblScopeChar = { fg = "#ffffffff" },
+		IblScopeChar = { fg = "#ffffff" },
 	},
 }
 
@@ -33,6 +46,12 @@ M.nvdash = {
     "",
     "",
     "",
+  },
+}
+
+M.ui = {
+  tabufline = {
+    lazyload = false,
   },
 }
 

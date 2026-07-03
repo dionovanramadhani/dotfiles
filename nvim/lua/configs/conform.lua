@@ -16,6 +16,13 @@ local options = {
     timeout_ms = 1000,
     lsp_fallback = true,
   },
+
+  formatters = {
+    prettier = {
+      -- Memaksa menggunakan prettier dari Mason untuk menghindari error modul lokal proyek yang rusak
+      command = vim.fn.stdpath("data") .. "/mason/bin/prettier",
+    },
+  },
 }
 
 return options

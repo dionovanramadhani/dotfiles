@@ -7,19 +7,19 @@ vim.api.nvim_create_autocmd("LspAttach", {
     local client = vim.lsp.get_client_by_id(ev.data.client_id)
     if client and client:supports_method("textDocument/documentHighlight") then
       local highlight_group = vim.api.nvim_create_augroup("LspDocumentHighlight", { clear = false })
-      
+
       vim.api.nvim_create_autocmd({ "CursorHold", "CursorHoldI" }, {
         group = highlight_group,
         buffer = ev.buf,
         callback = vim.lsp.buf.document_highlight,
       })
-      
+
       vim.api.nvim_create_autocmd({ "CursorMoved", "CursorMovedI" }, {
         group = highlight_group,
         buffer = ev.buf,
         callback = vim.lsp.buf.clear_references,
       })
-      
+
       vim.api.nvim_create_autocmd("LspDetach", {
         group = highlight_group,
         buffer = ev.buf,
@@ -169,4 +169,34 @@ vim.api.nvim_create_autocmd({ "CursorHold" }, {
 vim.api.nvim_create_autocmd({ "CursorMoved", "InsertEnter", "BufLeave" }, {
   pattern = "*",
   callback = close_hover_preview,
+})
+
+
+-- Automatically reload files when they change on disk (e.g. from git, AI agents)
+vim.api.nvim_create_autocmd({ "FocusGained", "BufEnter", "CursorHold", "CursorHoldI" }, {
+  pattern = "*",
+  callback = function()
+    if vim.fn.getcmdwintype() == "" then
+      vim.cmd("checktime")
+    end
+  end,
+})
+
+-- Automatically enter Terminal (Insert) Mode when focusing or entering terminal buffers
+vim.api.nvim_create_autocmd({ "BufEnter", "WinEnter", "TermOpen" }, {
+  callback = function()
+    if vim.bo.buftype == "terminal" then
+      vim.cmd("startinsert")
+      -- Force mouse clicks to stay in Terminal (Insert) mode
+      vim.keymap.set("n", "<LeftRelease>", "<LeftRelease>i", { buffer = true, silent = true })
+    end
+  end,
+})
+
+-- Map 'q' to close GitGraph buffer automatically
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = "gitgraph",
+  callback = function()
+    vim.keymap.set("n", "q", "<cmd>bdelete!<CR>", { buffer = true, silent = true, desc = "Close GitGraph" })
+  end,
 })
