@@ -21,7 +21,7 @@ return {
     opts = {
       ensure_installed = {
         "vim", "lua", "vimdoc",
-        "html", "css", "javascript", "typescript", "tsx"
+        "html", "css", "javascript", "typescript", "tsx", "prisma"
       },
     },
   },
@@ -30,10 +30,21 @@ return {
     "mg979/vim-visual-multi",
     init = function()
       vim.g.VM_maps = {
-        ["Find Under"] = "<C-d>",
-        ["Find Subword Under"] = "<C-d>",
-        ["Select All"] = "<C-S-l>",
+        ["Find Under"] = "<D-d>",
+        ["Find Subword Under"] = "<D-d>",
+        ["Select All"] = "<D-S-l>",
       }
+    end,
+    config = function()
+      -- Map Cmd+d dan Cmd+Shift+l di semua mode (Normal, Visual, dan Select Mode)
+      -- Kita HARUS menyetel remap = true agar Neovim dapat mengevaluasi shortcut <Plug> bawaan plugin
+      vim.keymap.set("n", "<D-d>", "<Plug>(VM-Find-Under)", { remap = true, silent = true, desc = "VM: Find Under" })
+      vim.keymap.set("x", "<D-d>", "<Plug>(VM-Find-Subword-Under)", { remap = true, silent = true, desc = "VM: Find Under (Visual)" })
+      vim.keymap.set("s", "<D-d>", "<C-g><Plug>(VM-Find-Subword-Under)", { remap = true, silent = true, desc = "VM: Find Under (Select)" })
+
+      vim.keymap.set("n", "<D-S-l>", "<Plug>(VM-Select-All)", { remap = true, silent = true, desc = "VM: Select All" })
+      vim.keymap.set("x", "<D-S-l>", "<Plug>(VM-Select-All)", { remap = true, silent = true, desc = "VM: Select All (Visual)" })
+      vim.keymap.set("s", "<D-S-l>", "<C-g><Plug>(VM-Select-All)", { remap = true, silent = true, desc = "VM: Select All (Select)" })
     end,
     lazy = false,
   },
@@ -109,4 +120,153 @@ return {
     end,
   },
 
+  {
+    "kevinhwang91/nvim-ufo",
+    dependencies = { "kevinhwang91/promise-async" },
+    event = "BufReadPost",
+    opts = {
+      provider_selector = function(bufnr, filetype, buftype)
+        return { "treesitter", "indent" }
+      end,
+    },
+    config = function(_, opts)
+      vim.o.foldcolumn = "1"
+      vim.o.foldlevel = 99
+      vim.o.foldlevelstart = 99
+      vim.o.foldenable = true
+      vim.o.fillchars = [[eob: ,fold: ,foldopen:,foldsep:│,foldclose:]]
+
+      require("ufo").setup(opts)
+
+      -- Keymaps for folding (zR: open all, zM: close all, za: toggle under cursor)
+      vim.keymap.set("n", "zR", require("ufo").openAllFolds, { desc = "Open all folds" })
+      vim.keymap.set("n", "zM", require("ufo").closeAllFolds, { desc = "Close all folds" })
+      vim.keymap.set("n", "za", "za", { desc = "Toggle fold" })
+    end,
+  },
+
+  {
+    "Bekaboo/dropbar.nvim",
+    dependencies = {
+      "nvim-tree/nvim-web-devicons",
+    },
+    lazy = false,
+  },
+
+  {
+    "lewis6991/gitsigns.nvim",
+    opts = {
+      attach_to_untracked = true,
+      current_line_blame = true,
+      current_line_blame_opts = {
+        virt_text = true,
+        virt_text_pos = "eol", -- 'eol' | 'overlay' | 'right_align'
+        delay = 500,           -- Delay sebelum memunculkan info commit (ms)
+      },
+    },
+  },
+
+  {
+    "sindrets/diffview.nvim",
+    cmd = { "DiffviewOpen", "DiffviewClose", "DiffviewToggleFiles", "DiffviewFocusFiles" },
+    opts = {},
+  },
+
+  {
+    "NeogitOrg/neogit",
+    dependencies = {
+      "nvim-lua/plenary.nvim",
+      "sindrets/diffview.nvim",
+      "nvim-telescope/telescope.nvim",
+    },
+    cmd = "Neogit",
+    opts = {
+      kind = "vsplit",
+      integrations = {
+        diffview = true,
+      },
+    },
+  },
+
+  {
+    "isakbm/gitgraph.nvim",
+    dependencies = { "sindrets/diffview.nvim" },
+    keys = {
+      {
+        "<leader>gg",
+        function()
+          require("gitgraph").draw({}, { all = true, max_count = 5000 })
+        end,
+        desc = "GitGraph Draw",
+      },
+    },
+    opts = {
+      symbols = {
+        merge_commit = "",
+        commit = "",
+        merge_commit_end = "",
+        commit_end = "",
+        GVER = "│",
+        GHOR = "─",
+        GCLD = "┌",
+        GCRD = "┐",
+        GCLU = "└",
+        GCRU = "┘",
+        GLUD = "┘",
+        GLUR = "┘",
+        GRLD = "┌",
+        GRRU = "┐",
+        RGCL = "┌",
+        RGCR = "┐",
+        RGIL = "│",
+        RGIR = "│",
+        RGLU = "└",
+        RGRU = "┘",
+        GLRD = "┌",
+        GLRU = "┘",
+        SUB = "│",
+        ROUTE_HOR = "─",
+        ROUTE_VER = "│",
+        ROUTE_CROSS = "┼",
+      },
+      format = {
+        timestamp = "%Y-%m-%d %H:%M:%S",
+        fields = { "hash", "timestamp", "author", "branch_name", "tag" },
+      },
+      hooks = {
+        on_select_commit = function(commit)
+          vim.notify("Opening diff for commit " .. commit.hash)
+          vim.cmd("DiffviewOpen " .. commit.hash .. "^!")
+        end,
+        on_select_range_commit = function(from, to)
+          vim.notify("Opening diff from " .. from.hash .. " to " .. to.hash)
+          vim.cmd("DiffviewOpen " .. from.hash .. ".." .. to.hash)
+        end,
+      },
+    },
+  },
+
+  {
+    "nvim-tree/nvim-tree.lua",
+    opts = {
+      diagnostics = {
+        enable = true,
+        show_on_dirs = true,
+        icons = {
+          hint = "",
+          info = "",
+          warning = "",
+          error = "",
+        },
+      },
+      git = {
+        enable = true,
+        ignore = false,
+      },
+      renderer = {
+        highlight_git = true,
+        highlight_diagnostics = "all",
+      },
+    },
+  },
 }
