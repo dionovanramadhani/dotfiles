@@ -116,82 +116,125 @@ return {
 
   {
     "hrsh7th/nvim-cmp",
+    event = "InsertEnter",
     opts = function()
       local cmp = require("cmp")
+      local luasnip = require("luasnip")
       local conf = require("nvchad.configs.cmp")
 
-      -- Disable completion inside strings using Treesitter context
+      -- ─── Disable completion inside strings ───────────────────────────
       conf.enabled = function()
-        -- Disable in prompt buffers (telescope, etc.)
         local buftype = vim.api.nvim_get_option_value("buftype", { buf = 0 })
-        if buftype == "prompt" then
-          return false
-        end
+        if buftype == "prompt" then return false end
 
-        -- Check if cursor is inside a string node via Treesitter
-        local ok, ts_utils = pcall(require, "nvim-treesitter.ts_utils")
-        if ok then
-          local node = ts_utils.get_node_at_cursor()
-          while node do
-            local node_type = node:type()
-            -- Common string node types across languages
-            if node_type:find("string") or node_type:find("template") or node_type == "raw_string" then
+        local ok, node = pcall(vim.treesitter.get_node)
+        if ok and node then
+          local current = node
+          while current do
+            local t = current:type()
+            if t:find("string") or t:find("template") then
               return false
             end
-            node = node:parent()
+            current = current:parent()
           end
         end
-
         return true
       end
 
-      conf.mapping["<Tab>"] = cmp.mapping(function(fallback)
-        if cmp.visible() then
-          cmp.confirm({ behavior = cmp.ConfirmBehavior.Insert, select = true })
-        elseif require("luasnip").expand_or_jumpable() then
-          require("luasnip").expand_or_jump()
-        else
+      -- ─── Rebuild mapping sekaligus (bukan modifikasi satu per satu) ──
+      conf.mapping = {
+        -- Ctrl shortcuts (tetap dari NvChad)
+        ["<C-p>"]     = cmp.mapping.select_prev_item(),
+        ["<C-n>"]     = cmp.mapping.select_next_item(),
+        ["<C-d>"]     = cmp.mapping.scroll_docs(-4),
+        ["<C-f>"]     = cmp.mapping.scroll_docs(4),
+        ["<C-Space>"] = cmp.mapping.complete(),
+        ["<C-e>"]     = cmp.mapping.close(),
+
+        -- Enter: TIDAK accept, berjalan normal
+        ["<CR>"] = cmp.mapping(function(fallback)
           fallback()
-        end
-      end, { "i", "s" })
+        end, { "i", "s" }),
 
-      conf.mapping["<S-Tab>"] = cmp.mapping(function(fallback)
-        if require("luasnip").jumpable(-1) then
-          require("luasnip").jump(-1)
-        else
-          fallback()
-        end
-      end, { "i", "s" })
+        -- Esc: tutup popup, tetap di insert mode
+        ["<Esc>"] = cmp.mapping(function(fallback)
+          if cmp.visible() then
+            cmp.abort()
+          else
+            fallback()
+          end
+        end, { "i" }),
 
-      conf.mapping["<Down>"] = cmp.mapping(function(fallback)
-        if cmp.visible() then
-          cmp.select_next_item()
-        else
-          fallback()
-        end
-      end, { "i", "s" })
+        -- Down: navigasi ke bawah; buka popup dulu jika belum muncul
+        ["<Down>"] = cmp.mapping(function(fallback)
+          if cmp.visible() then
+            cmp.select_next_item({ behavior = cmp.SelectBehavior.Select })
+          else
+            cmp.complete()
+            vim.schedule(function()
+              if cmp.visible() then
+                cmp.select_next_item({ behavior = cmp.SelectBehavior.Select })
+              end
+            end)
+          end
+        end, { "i", "s" }),
 
-      conf.mapping["<Up>"] = cmp.mapping(function(fallback)
-        if cmp.visible() then
-          cmp.select_prev_item()
-        else
-          fallback()
-        end
-      end, { "i", "s" })
+        -- Up: navigasi ke atas; buka popup dulu jika belum muncul
+        ["<Up>"] = cmp.mapping(function(fallback)
+          if cmp.visible() then
+            cmp.select_prev_item({ behavior = cmp.SelectBehavior.Select })
+          else
+            cmp.complete()
+            vim.schedule(function()
+              if cmp.visible() then
+                cmp.select_prev_item({ behavior = cmp.SelectBehavior.Select })
+              end
+            end)
+          end
+        end, { "i", "s" }),
 
-      conf.mapping["<CR>"] = cmp.mapping(function(fallback)
-        fallback()
-      end)
+        -- Tab: confirm jika ada item dipilih, atau navigasi ke berikutnya,
+        --      atau expand luasnip snippet
+        ["<Tab>"] = cmp.mapping(function(fallback)
+          if cmp.visible() then
+            local entry = cmp.get_selected_entry()
+            if entry then
+              cmp.confirm({ behavior = cmp.ConfirmBehavior.Insert, select = false })
+            else
+              cmp.select_next_item({ behavior = cmp.SelectBehavior.Select })
+            end
+          elseif luasnip.expand_or_jumpable() then
+            luasnip.expand_or_jump()
+          else
+            fallback()
+          end
+        end, { "i", "s" }),
 
-      -- Esc: tutup suggestion tapi tetap di insert mode
-      -- Kalau popup tidak muncul, Esc berjalan normal (keluar ke normal mode)
-      conf.mapping["<Esc>"] = cmp.mapping(function(fallback)
-        if cmp.visible() then
-          cmp.abort()  -- tutup popup, tetap insert mode
-        else
-          fallback()   -- Esc normal → keluar ke normal mode
-        end
-      end, { "i" })
+        -- Shift+Tab: navigasi ke atas, atau luasnip jump back
+        ["<S-Tab>"] = cmp.mapping(function(fallback)
+          if cmp.visible() then
+            cmp.select_prev_item({ behavior = cmp.SelectBehavior.Select })
+          elseif luasnip.jumpable(-1) then
+            luasnip.jump(-1)
+          else
+            fallback()
+          end
+        end, { "i", "s" }),
+      }
+
+      -- ─── Filter sources untuk menghilangkan suggestion "Text" ────────
+      conf.sources = {
+        {
+          name = "nvim_lsp",
+          entry_filter = function(entry, ctx)
+            -- 1 adalah CompletionItemKind.Text (Suggestion Text biasa)
+            return entry:get_kind() ~= 1
+          end,
+        },
+        { name = "luasnip" },
+        { name = "nvim_lua" },
+        { name = "async_path" },
+      }
 
       return conf
     end,
