@@ -29,35 +29,50 @@ return {
   {
     "mg979/vim-visual-multi",
     init = function()
+      -- Nonaktifkan semua default mapping agar tidak ada konflik
+      vim.g.VM_default_mappings = 0
       vim.g.VM_maps = {
-        ["Find Under"] = "<C-d>",
-        ["Find Subword Under"] = "<C-d>",
-        ["Select All"] = "<C-S-l>",
-        ["Add Cursor Up"] = "<C-S-A-Up>",
-        ["Add Cursor Down"] = "<C-S-A-Down>",
+        ["Select All"] = "<D-S-l>",
+        ["Add Cursor Up"] = "<D-S-A-Up>",
+        ["Add Cursor Down"] = "<D-S-A-Down>",
       }
     end,
     config = function()
-      -- Map untuk mode Insert dan Select agar meneruskan ke mapping Normal/Visual dari plugin.
-      -- Kita menggunakan remap = true agar Neovim memicu mapping Ctrl+d dan Ctrl+Shift+l milik vim-visual-multi.
-      vim.keymap.set("i", "<C-d>", "<Esc><C-d>", { remap = true, silent = true, desc = "VM: Find Under (Insert)" })
-      vim.keymap.set("s", "<C-d>", function()
-        -- Menggunakan feedkeys secara berurutan: switch mode dari Select ke Visual dengan <C-g> (synchronous),
-        -- lalu memicu C-d dalam mode Visual secara rekursif (m) agar terbaca oleh plugin.
-        vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<C-g>", true, false, true), "nx", false)
-        vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<C-d>", true, false, true), "m", false)
+      -- Normal mode: <D-d> → Find Under (tambah kata di bawah kursor ke multi-select)
+      vim.keymap.set("n", "<D-d>", "<Plug>(VM-Find-Under)", { silent = true, desc = "VM: Find Under (Normal)" })
+      -- Visual mode: <D-d> → Visual Find Under (tambah seleksi visual ke multi-select)
+      vim.keymap.set("x", "<D-d>", "<Plug>(VM-Visual-Find)", { silent = true, desc = "VM: Find Under (Visual)" })
+
+      -- Insert mode: keluar ke Normal dulu, lalu trigger Find Under
+      vim.keymap.set("i", "<D-d>", function()
+        vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<Esc>", true, false, true), "nx", false)
+        vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<Plug>(VM-Find-Under)", true, false, true), "m", false)
+      end, { silent = true, desc = "VM: Find Under (Insert)" })
+
+      -- Select mode: keluar ke Normal dulu, lalu trigger Find Under
+      vim.keymap.set("s", "<D-d>", function()
+        vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<Esc>", true, false, true), "nx", false)
+        vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<Plug>(VM-Find-Under)", true, false, true), "m", false)
       end, { silent = true, desc = "VM: Find Under (Select)" })
 
-      vim.keymap.set("i", "<C-S-l>", "<Esc><C-S-l>", { remap = true, silent = true, desc = "VM: Select All (Insert)" })
-      vim.keymap.set("s", "<C-S-l>", function()
-        -- Sama seperti di atas untuk Ctrl+Shift+l
-        vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<C-g>", true, false, true), "nx", false)
-        vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<C-S-l>", true, false, true), "m", false)
+      -- Normal mode: <D-S-l> → Select All occurrences
+      vim.keymap.set("n", "<D-S-l>", "<Plug>(VM-Select-All)", { silent = true, desc = "VM: Select All (Normal)" })
+      -- Visual mode: <D-S-l> → Select All occurrences
+      vim.keymap.set("x", "<D-S-l>", "<Plug>(VM-Visual-All)", { silent = true, desc = "VM: Select All (Visual)" })
+
+      vim.keymap.set("i", "<D-S-l>", function()
+        vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<Esc>", true, false, true), "nx", false)
+        vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<Plug>(VM-Select-All)", true, false, true), "m", false)
+      end, { silent = true, desc = "VM: Select All (Insert)" })
+
+      vim.keymap.set("s", "<D-S-l>", function()
+        vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<Esc>", true, false, true), "nx", false)
+        vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<Plug>(VM-Select-All)", true, false, true), "m", false)
       end, { silent = true, desc = "VM: Select All (Select)" })
 
-      -- Map Ctrl+Shift+Alt+Up/Down (dan variasinya) untuk menambah cursor
-      local keys_up = { "<C-S-A-Up>", "<C-A-S-Up>", "<C-S-M-Up>", "<C-M-S-Up>" }
-      local keys_down = { "<C-S-A-Down>", "<C-A-S-Down>", "<C-S-M-Down>", "<C-M-S-Down>" }
+      -- Map Cmd+Shift+Alt+Up/Down (dan variasinya) untuk menambah cursor
+      local keys_up = { "<D-S-A-Up>", "<D-A-S-Up>", "<D-S-M-Up>", "<D-M-S-Up>" }
+      local keys_down = { "<D-S-A-Down>", "<D-A-S-Down>", "<D-S-M-Down>", "<D-M-S-Down>" }
 
       for _, key in ipairs(keys_up) do
         vim.keymap.set("n", key, "<Plug>(VM-Add-Cursor-Up)", { remap = true, silent = true, desc = "VM: Add Cursor Up" })
@@ -105,6 +120,31 @@ return {
       local cmp = require("cmp")
       local conf = require("nvchad.configs.cmp")
 
+      -- Disable completion inside strings using Treesitter context
+      conf.enabled = function()
+        -- Disable in prompt buffers (telescope, etc.)
+        local buftype = vim.api.nvim_get_option_value("buftype", { buf = 0 })
+        if buftype == "prompt" then
+          return false
+        end
+
+        -- Check if cursor is inside a string node via Treesitter
+        local ok, ts_utils = pcall(require, "nvim-treesitter.ts_utils")
+        if ok then
+          local node = ts_utils.get_node_at_cursor()
+          while node do
+            local node_type = node:type()
+            -- Common string node types across languages
+            if node_type:find("string") or node_type:find("template") or node_type == "raw_string" then
+              return false
+            end
+            node = node:parent()
+          end
+        end
+
+        return true
+      end
+
       conf.mapping["<Tab>"] = cmp.mapping(function(fallback)
         if cmp.visible() then
           cmp.confirm({ behavior = cmp.ConfirmBehavior.Insert, select = true })
@@ -142,6 +182,16 @@ return {
       conf.mapping["<CR>"] = cmp.mapping(function(fallback)
         fallback()
       end)
+
+      -- Esc: tutup suggestion tapi tetap di insert mode
+      -- Kalau popup tidak muncul, Esc berjalan normal (keluar ke normal mode)
+      conf.mapping["<Esc>"] = cmp.mapping(function(fallback)
+        if cmp.visible() then
+          cmp.abort()  -- tutup popup, tetap insert mode
+        else
+          fallback()   -- Esc normal → keluar ke normal mode
+        end
+      end, { "i" })
 
       return conf
     end,
@@ -307,7 +357,7 @@ return {
     opts = function()
       local conf = require("nvchad.configs.telescope")
       conf.defaults.mappings.i = conf.defaults.mappings.i or {}
-      conf.defaults.mappings.i["<C-Backspace>"] = { "<C-w>", type = "command" }
+      conf.defaults.mappings.i["<D-Backspace>"] = { "<C-w>", type = "command" }
       return conf
     end,
   },
@@ -316,8 +366,29 @@ return {
     "e-sigs/winbuf.nvim",
     event = "VeryLazy",
     config = function()
+      local function get_winbuf_hl()
+        local colors = require("base46").get_theme_tb("base_30")
+        return {
+          active              = { fg = colors.white, bg = colors.black, bold = true },
+          active_sep          = { fg = colors.blue, bg = colors.black },
+          inactive            = { fg = colors.light_grey, bg = colors.black2 },
+          inactive_sep        = { fg = colors.light_grey, bg = colors.black2 },
+          active_close        = { fg = colors.red, bg = colors.black },
+          inactive_close      = { fg = colors.light_grey, bg = colors.black2 },
+          active_modified     = { fg = colors.yellow, bg = colors.black },
+          inactive_modified   = { fg = colors.light_grey, bg = colors.black2 },
+          active_diag_error   = { fg = colors.red, bg = colors.black, bold = true },
+          active_diag_warn    = { fg = colors.yellow, bg = colors.black },
+          inactive_diag_error = { fg = colors.red, bg = colors.black2 },
+          inactive_diag_warn  = { fg = colors.yellow, bg = colors.black2 },
+          fill                = { bg = colors.black2 },
+          active_underline    = { sp = colors.blue, underline = true },
+        }
+      end
+
       require("winbuf").setup({
         style = "slant",
+        highlights = get_winbuf_hl(),
       })
 
       -- Custom winbuf.render override to support Git status (untracked, modified)
@@ -366,6 +437,9 @@ return {
       end
 
       local function apply_custom_highlights()
+        -- First re-apply base winbuf highlights to get the base background colors
+        require("winbuf.highlights").setup(get_winbuf_hl())
+
         local err_fg = (get_hl(0, { name = "DiagnosticError", link = false }) or {}).fg or 16468276
         local warn_fg = (get_hl(0, { name = "DiagnosticWarn", link = false }) or {}).fg or 16679219
         local add_fg = (get_hl(0, { name = "GitSignsAdd", link = false }) or {}).fg or 12106534
@@ -389,7 +463,8 @@ return {
 
       apply_custom_highlights()
 
-      api.nvim_create_autocmd("ColorScheme", {
+      api.nvim_create_autocmd({ "ColorScheme", "User" }, {
+        pattern = { "*", "NvThemeReload" },
         callback = apply_custom_highlights,
       })
 

@@ -19,10 +19,10 @@ vim.opt.keymodel = "startsel,stopsel"
 -- Neovide Configuration
 if vim.g.neovide then
   -- Gunakan font MesloLGS NF yang terinstal di sistem Anda
-  vim.o.guifont = "MesloLGS NF:h12"
+  vim.o.guifont = "MesloLGS Nerd Font Mono:h14"
 
   -- Mengatur tinggi baris (line height/spacing) - silakan ubah angkanya sesuai kenyamanan
-  vim.opt.linespace = 12
+  vim.opt.linespace = 14
 
   -- Animasi kursor (kecepatan & gaya)
   vim.g.neovide_cursor_animation_length = 0.13
