@@ -21,8 +21,29 @@ if vim.g.neovide then
   -- Gunakan font MesloLGS NF yang terinstal di sistem Anda
   vim.o.guifont = "MesloLGS NF:h12"
 
-  -- Mengatur tinggi baris (line height/spacing) - silakan ubah angkanya sesuai kenyamanan
-  vim.opt.linespace = 12
+  -- Mengatur tinggi baris (line height/spacing) secara dinamis
+  -- linespace = 12 untuk buffer script/code, linespace = 10 untuk dashboard, terminal, dan antigravity
+  local linespace_group = vim.api.nvim_create_augroup("NeovideLineSpace", { clear = true })
+  vim.api.nvim_create_autocmd({ "BufEnter", "WinEnter", "BufWinEnter", "FileType" }, {
+    group = linespace_group,
+    callback = function()
+      local buftype = vim.bo.buftype
+      local filetype = vim.bo.filetype
+      local bufname = vim.api.nvim_buf_get_name(0)
+
+      local is_dashboard = (filetype == "nvdash")
+      local is_terminal = (buftype == "terminal")
+      local is_antigravity = (bufname:match "term://.*agy" ~= nil)
+      local is_nvimtree = (filetype == "NvimTree")
+      local is_nofile = (buftype == "nofile")
+
+      if is_dashboard or is_terminal or is_antigravity or is_nvimtree or is_nofile then
+        vim.opt.linespace = 3
+      else
+        vim.opt.linespace = 12
+      end
+    end,
+  })
 
   -- Animasi kursor (kecepatan & gaya)
   vim.g.neovide_cursor_animation_length = 0.13

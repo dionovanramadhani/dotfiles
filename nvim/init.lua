@@ -1,7 +1,6 @@
-if vim.fn.has("mac") == 1 then
+if vim.fn.has "mac" == 1 then
   vim.env.PATH = "/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/bin:" .. vim.env.PATH
 end
-
 
 vim.g.base46_cache = vim.fn.stdpath "data" .. "/base46/"
 vim.g.mapleader = " "
