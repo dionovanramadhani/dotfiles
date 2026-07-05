@@ -1,0 +1,9 @@
+#!/bin/sh
+exec tail -n +3 $0
+
+menuentry "Windows 10" --class windows --class os {
+   insmod part_gpt
+   insmod fat
+   search --no-floppy --fs-uuid --set=root 4E61-5688
+   chainloader /EFI/Microsoft/Boot/bootmgfw.efi
+}

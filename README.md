@@ -1,135 +1,80 @@
-# 🛠️ Gruvbox Dark Setup
+# BSPWM & Ricing Backup Pack (Debian -> Arch Linux)
 
-Welcome to my **dotfiles** repository! This is a collection of my personal Linux configuration files centered around **bspwm** (tiling window manager) with a consistent, clean, and productive **Gruvbox Dark** theme.
-
----
-
-## 📸 Visual Preview
-
-### Desktop Preview
-
-This repository is configured to use the beautiful **Gruvbox** theme for the status bar and launcher:
-
-|                Default View                |                i3 Mode View                |
-| :----------------------------------------: | :----------------------------------------: |
-| ![Screenshot 1](polybar/screenshots/1.png) | ![Screenshot 2](polybar/screenshots/2.png) |
+Folder ini berisi semua file konfigurasi, shortcut, custom scripts, tema, ikon, font, dan wallpaper aktif dari sistem Debian-mu saat ini. Kamu bisa memindahkan folder ini ke USB drive, disk eksternal, atau menyimpannya di cloud saat menginstal distro Arch Linux barumu.
 
 ---
 
-## ⚙️ System Components & Tech Stack
-
-Below are the core technologies and applications used in this setup:
-
-| Component                | Application                                             | Description / Theme                                          |
-| :----------------------- | :------------------------------------------------------ | :----------------------------------------------------------- |
-| **Window Manager**       | [bspwm](https://github.com/baskerville/bspwm)           | A lightweight, tiling window manager                         |
-| **Hotkey Daemon**        | [sxhkd](https://github.com/baskerville/sxhkd)           | Keyboard shortcut manager                                    |
-| **Status Bar**           | [polybar](https://github.com/polybar/polybar)           | Modular status bar styled with Gruvbox Dark                  |
-| **Application Launcher** | [rofi](https://github.com/davatorium/rofi)              | Customized application menu & power menu                     |
-| **Terminal Emulator**    | [alacritty](https://github.com/alacritty/alacritty)     | GPU-accelerated terminal with Bold typography                |
-| **Text Editor**          | [neovim](https://github.com/neovim/neovim)              | Configured using the [NvChad](https://nvchad.com/) framework |
-| **System Info**          | [fastfetch](https://github.com/fastfetch-cli/fastfetch) | Customized system info layout in Red                         |
-| **Shell**                | Zsh                                                     | Configured directly in Alacritty                             |
-
----
-
-## 🖥️ Dual Monitor Configuration
-
-This setup is optimized specifically for a highly productive **Dual-Monitor** workstation:
-
-1. **DP-0 (Primary Monitor)**:
-   - Resolution: `1920x1080 @ 144Hz`
-   - Orientation: Landscape (Primary)
-   - Workspaces: `1`, `2`, `3`, `4`, `5`
-   - Displays **Polybar** at the top.
-2. **HDMI-0 (Secondary Monitor)**:
-   - Resolution: `2560x1080 @ 75Hz`
-   - Orientation: Portrait (Rotated right)
-   - Workspaces: `6`, `7`, `8`, `9`
-   - No Polybar to maximize the vertical viewing area.
-
----
-
-## ⌨️ Key Keyboard Shortcuts (sxhkd)
-
-Here are some of the most important hotkeys configured in `sxhkdrc`:
-
-### Applications & Utilities
-
-- `Alt + Return` : Launch **Alacritty** terminal
-- `Super + Space` : Open **Rofi** (Application Launcher)
-- `Super + X` : Open **Power Menu** (`powermenu.sh`)
-- `Super + W` : Open **Wallpaper Menu** (`wallpaper_menu.sh`)
-- `Alt + Shift + C` : Open Calendar (`calcurse`) in a floating terminal window
-- `Alt + B` / `Super + H` : Launch the **Helium** web browser
-- `Alt + O` : Open **Thunar** file manager
-- `Alt + D` : Open **Discord**
-- `Alt + W` : Open **WhatsApp Web** in Helium
-
-### Window & Workspace Management
-
-- `Super + Q` / `Ctrl + Q` : Close the active window
-- `Alt + F` : Toggle between **Floating** and **Tiled** states
-- `Super + Arrow Keys` : Shift focus to a window in the specified direction
-- `Super + Shift + Arrow Keys` : Swap window positions
-- `Super + Alt + Arrow Keys` : Move the active window between monitors (`DP-0` <-> `HDMI-0`)
-- `Alt + [1-9]` : Switch workspace (desktop)
-- `Alt + Shift + [1-9]` : Move the active window to a specific workspace
-
-### Screenshots (maim)
-
-- `Print` : Take a fullscreen screenshot (saved to `~/Pictures/Screenshots/` and copied to clipboard)
-- `Super + Shift + S` : Screenshot a selected area (copied directly to clipboard)
-- `Alt + Print` : Screenshot the active window (saved and copied to clipboard)
+## 📂 Struktur Backup
+* **`config/`**: Berisi folder konfigurasi dari `~/.config/` untuk aplikasi desktop environment:
+  * `bspwm/` (Window manager settings)
+  * `sxhkd/` (Keyboard shortcuts)
+  * `polybar/` (Status bar)
+  * `rofi/` (App launcher & menus)
+  * `picom/` (Compositor/transparency/fading)
+  * `alacritty/` (Terminal emulator)
+  * `cava/` (Console audio visualizer)
+  * `gtk-3.0/` & `gtk-4.0/` (GTK theme configs)
+  * `autostart/` (Desktop autostart files)
+  * `nvim/` (Neovim text editor configuration)
+  * `Code/User/` (VSCode user settings & keybindings)
+  * `fastfetch/` (Fastfetch system info styling)
+  * `neovide/` (Neovide editor GUI configuration)
+  * `zed/` (Zed editor configuration)
+  * `Thunar/` (Thunar custom actions & shortcuts)
+  * `calcurse/` (Calcurse calendar configuration & shortcuts)
+  * `xsettingsd/` (Desktop xsettings configurations)
+  * `mimeapps.list` (Default file associations)
+* **`local_bin/`**: Berisi script kustom buatanmu dari `~/.local/bin/` (seperti menu audio, alt-tab switcher, powermenu, dll.).
+* **`home/`**: Berisi dotfiles penting dari home directory-mu:
+  * `.zshrc` & `.p10k.zsh` (Powerlevel10k shell styling)
+  * `.Xresources` (Cursor & X11 settings)
+  * `.fehbg` (Wallpaper restorer)
+  * `.gtkrc-2.0` (GTK theme settings)
+* **`themes/`**: Menyimpan custom GTK themes (`Everforest-BL-MB-Dark`, `Gruvbox-BL-LB-Dark`, dll.).
+* **`icons/`**: Menyimpan custom icon packs (`Everforest-Dark`, `buuf-icons-for-plasma`).
+* **`fonts/`**: Menyimpan font kustom (`MaterialIcons`, `NerdFonts`).
+* **`wallpaper/`**: Menyimpan wallpaper aktif (`street-4.png`) berserta path aslinya agar dapat dikembalikan dengan pas.
 
 ---
 
-## 🚀 Installation & Requirements
+## ⚡ Cara Restore di Arch Linux
 
-### 1. Fonts & Icons
-
-To ensure all glyphs, icons, and text elements render correctly, please install:
-
-- **JetBrains Mono Nerd Font** (used in Rofi, Alacritty, and Polybar)
-- **Material Icons (Round)** (provided in `polybar/fonts/MaterialIcons`)
-
-Install the Material Icons manually:
+### 1. Install Dependencies
+Sebelum menjalankan restore script, pastikan kamu telah menginstal semua dependency desktop environment dan tool pendukung di Arch Linux menggunakan `pacman` dan helper AUR (seperti `yay` atau `paru`):
 
 ```bash
-mkdir -p ~/.fonts
-cp -R ~/.config/polybar/fonts/MaterialIcons ~/.fonts/
-fc-cache -f
+# 1. Install tool utama via Pacman
+sudo pacman -S bspwm sxhkd polybar rofi picom alacritty cava feh zsh xclip maim xdotool calcurse thunar neovim code fastfetch neovide zed xsettingsd breeze-gtk breeze-icons breeze polkit-kde-agent
 ```
 
-Additionally, install the **Papirus** icon theme using your Linux distribution's package manager for the application launcher.
-
-### 2. Setting Up Dotfiles
-
-You can symlink these configuration directories to your `~/.config/` folder:
+### 2. Jalankan Restore Script
+Buka terminal, arahkan ke folder backup ini, lalu jalankan:
 
 ```bash
-# Back up existing configurations if they exist
-mv ~/.config/bspwm ~/.config/bspwm.backup
-mv ~/.config/sxhkd ~/.config/sxhkd.backup
-mv ~/.config/polybar ~/.config/polybar.backup
-mv ~/.config/rofi ~/.config/rofi.backup
-mv ~/.config/alacritty ~/.config/alacritty.backup
-mv ~/.config/nvim ~/.config/nvim.backup
-mv ~/.config/fastfetch ~/.config/fastfetch.backup
-
-# Create symlinks from this dotfiles repository to ~/.config/
-# (Assuming the repository is located at ~/projects/portfolio/dotfiles)
-ln -sf ~/projects/portfolio/dotfiles/bspwm ~/.config/bspwm
-ln -sf ~/projects/portfolio/dotfiles/sxhkd ~/.config/sxhkd
-ln -sf ~/projects/portfolio/dotfiles/polybar ~/.config/polybar
-ln -sf ~/projects/portfolio/dotfiles/rofi ~/.config/rofi
-ln -sf ~/projects/portfolio/dotfiles/alacritty ~/.config/alacritty
-ln -sf ~/projects/portfolio/dotfiles/nvim ~/.config/nvim
-ln -sf ~/projects/portfolio/dotfiles/fastfetch ~/.config/fastfetch
+chmod +x restore.sh
+./restore.sh
 ```
 
-### 3. Post-Install & Services
+Script di atas akan secara otomatis memindahkan semua folder/file ke lokasinya masing-masing di home directory barumu (`~/.config`, `~/.local/bin`, `~/`, dll.), membetulkan hak akses executable pada script kustom, dan memperbarui font cache.
 
-- **Wallpaper**: Setup uses `feh` to manage the wallpaper, which is loaded automatically through `bspwmrc` (using `.fehbg`).
-- **Compositor**: `picom` is used for window transparency, blur, and shadows (`picom --config ~/.config/picom/picom.conf`).
-- **Polkit Agent**: The default XFCE authentication agent (`xfce-polkit`) is initiated on startup to handle GUI authentication prompts.
+---
+
+## ⚠️ Hal Penting yang Perlu Diperhatikan
+
+1. **Polkit Agent (PENTING)**:
+   * Konfigurasi `bspwmrc` di repositori ini telah diubah untuk menggunakan `polkit-kde-agent` secara default karena tersedia langsung di official repository Arch Linux.
+   * **Solusi**: Pastikan kamu memasang package `polkit-kde-agent` menggunakan Pacman di Arch Linux agar autentikasi hak akses root (misalnya untuk KDE Partition Manager atau mounting disk) berfungsi secara out-of-the-box.
+
+2. **Web Browser (Helium)**:
+   * Folder profile Helium di `~/.config/net.imput.helium` memiliki cache sebesar ~1.2GB dan **sengaja dilewati** agar proses backup tetap ringan dan cepat.
+   * Kamu perlu menginstal Helium kembali (bisa dicari di AUR atau website resminya) dan login ulang ke WhatsApp Web/Spotify di dalamnya.
+
+3. **Wallpaper & Menu Wallpaper**:
+   * Script kustom wallpaper-mu mencari gambar di folder `/home/dionovan/Pictures/wallpaper-all`.
+   * Wallpaper aktif saat ini (`street-4.png`) telah di-restore ke folder tersebut secara otomatis. Namun, jika kamu memiliki wallpaper lain di folder `wallpaper-all` berukuran besar (total 1.3GB), pastikan kamu membackup folder `/home/dionovan/Pictures/wallpaper-all` secara manual ke harddisk/flashdisk eksternal dan menyalinnya kembali ke target.
+
+4. **Default Shell (Zsh)**:
+   * Setelah merestore `.zshrc` dan `.p10k.zsh`, ganti default shell user-mu ke Zsh dengan menjalankan:
+     ```bash
+     chsh -s $(which zsh)
+     ```

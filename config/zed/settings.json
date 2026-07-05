@@ -1,0 +1,129 @@
+// Zed settings
+//
+// For information on how to configure Zed, see the Zed
+// documentation: https://zed.dev/docs/configuring-zed
+//
+// To see all of Zed's default settings without changing your
+// custom settings, run `zed: open default settings` from the
+// command palette (cmd-shift-p / ctrl-shift-p)
+{
+  "agent": {
+    "default_model": {
+      "provider": "zed.dev",
+      "model": "claude-haiku-4-5",
+      "enable_thinking": true
+    },
+    "favorite_models": [],
+    "model_parameters": []
+  },
+  "cli_default_open_behavior": "new_window",
+  "terminal": {
+    "env": {},
+    "font_family": "FiraCode Nerd Font Mono"
+  },
+  "project_panel": {
+    "auto_fold_dirs": false
+  },
+  "tab_bar": {
+    "show": true
+  },
+  "multi_cursor_modifier": "alt",
+  "sticky_scroll": {
+    "enabled": false
+  },
+  "gutter": {
+    "line_numbers": true
+  },
+  "minimap": {
+    "show": "never"
+  },
+  "scrollbar": {
+    "axes": {
+      "horizontal": false
+    }
+  },
+  "cursor_shape": "block",
+  "buffer_font_family": "MesloLGL Nerd Font Mono",
+  "file_types": {
+    "dotenv": [
+      ".env*"
+    ],
+    "html": [
+      "*.ejs"
+    ],
+    "cpp": [
+      "iostream",
+      "atomic",
+      "bit",
+      "cctype",
+      "charconv",
+      "clocale",
+      "cmath",
+      "compare",
+      "concepts",
+      "cstddef",
+      "cstdint",
+      "cstdio",
+      "cstdlib",
+      "cstring",
+      "ctime",
+      "cwchar",
+      "exception",
+      "format",
+      "initializer_list",
+      "ios",
+      "iosfwd",
+      "istream",
+      "iterator",
+      "limits",
+      "locale",
+      "memory",
+      "mutex",
+      "new",
+      "ostream",
+      "ratio",
+      "stdexcept",
+      "stop_token",
+      "streambuf",
+      "system_error",
+      "thread",
+      "tuple",
+      "type_traits",
+      "typeinfo",
+      "utility",
+      "xfacet",
+      "xiosbase",
+      "xlocale",
+      "xlocbuf",
+      "xlocinfo",
+      "xlocmes",
+      "xlocmon",
+      "xlocnum",
+      "xloctime",
+      "xmemory",
+      "xstring",
+      "xtr1common",
+      "xutility"
+    ],
+    "css": [
+      "*.css"
+    ]
+  },
+  "use_on_type_format": true,
+  "show_whitespaces": "none",
+  "ensure_final_newline_on_save": true,
+  "tab_size": 2,
+  "icon_theme": {
+    "mode": "light",
+    "light": "Zed (Default)",
+    "dark": "Material Icon Theme"
+  },
+  "base_keymap": "VSCode",
+  "ui_font_size": 16,
+  "buffer_font_size": 15,
+  "theme": {
+    "mode": "dark",
+    "light": "One Light",
+    "dark": "Gruvbox Dark",
+  },
+}

@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=Disable DPMS
+Comment=Mematikan DPMS dan screensaver X11
+Exec=bash -c "sleep 5 && xset s off && xset -dpms && xset s noblank"
+Hidden=false
+NoDisplay=false
+X-GNOME-Autostart-enabled=true

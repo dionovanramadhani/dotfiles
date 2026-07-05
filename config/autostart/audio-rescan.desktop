@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=Audio Device Rescan
+Comment=Memaksa PipeWire mendeteksi ulang audio device saat login
+Exec=bash -c "sleep 2 && systemctl --user restart wireplumber"
+OnlyShowIn=XFCE;
+StartupNotify=false
+Terminal=false
+Hidden=false
