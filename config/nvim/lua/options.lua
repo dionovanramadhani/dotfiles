@@ -19,7 +19,7 @@ vim.opt.keymodel = "startsel,stopsel"
 -- Neovide Configuration
 if vim.g.neovide then
   -- Gunakan font MesloLGS NF yang terinstal di sistem Anda
-  vim.o.guifont = "MesloLGS NF:h12"
+  vim.o.guifont = "JetBrainsMono Nerd Font:h12"
 
   -- Mengatur tinggi baris (line height/spacing) secara dinamis
   -- linespace = 12 untuk buffer script/code, linespace = 10 untuk dashboard, terminal, dan antigravity

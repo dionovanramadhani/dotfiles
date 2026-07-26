@@ -1,3 +1,5 @@
+export PATH="/usr/bin:$PATH"
+export PATH="$HOME/.npm-global/bin:$PATH"
 # Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
 # Initialization code that may require console input (password prompts, [y/n]
 # confirmations, etc.) must go above this block; everything else may go below.
@@ -116,7 +118,7 @@ if [ -f ~/.bash_aliases ]; then
     . ~/.bash_aliases
 fi
 
-eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv bash)"
+eval "$($HOME/.linuxbrew/bin/brew shellenv)"
 
 export PATH=$PATH:/home/dionovan/.spicetify
 
@@ -136,6 +138,10 @@ export PATH="/home/dionovan/.local/bin:$PATH"
 alias agy-ide='/opt/Antigravity\ IDE/antigravity-ide'
 alias wgs-connect='nmcli connection up "WGS VPN" passwd-file ~/.vpn-secret.txt'
 alias wgs-disconnect='nmcli connection down WGS\ VPN'
-alias neovide='/home/linuxbrew/.linuxbrew/bin/neovide --fork'
-alias nvim='/home/linuxbrew/.linuxbrew/bin/neovide --fork'
-alias nvim-term='/home/linuxbrew/.linuxbrew/bin/nvim'
+alias neovide='/usr/bin/neovide --fork'
+alias nvim='/usr/bin/neovide --fork'
+alias nvim-term='/home/dionovan/.linuxbrew/bin/nvim'
+alias agy-yolo='agy --dangerously-skip-permissions'
+
+# OpenClaw Completion
+[ -f "/home/dionovan/.openclaw/completions/openclaw.zsh" ] && source "/home/dionovan/.openclaw/completions/openclaw.zsh"

@@ -1,46 +1,46 @@
 // Place your key bindings in this file to override the defaults
 [
   {
-    "key": "alt+e",
+    "key": "ctrl+e",
     "command": "workbench.action.terminal.toggleTerminal",
-    "when": "terminal.active"
+    "when": "terminal.active",
   },
   {
     "key": "ctrl+`",
     "command": "-workbench.action.terminal.toggleTerminal",
-    "when": "terminal.active"
+    "when": "terminal.active",
   },
   {
     "key": "ctrl+shift+backspace",
     "command": "editor.action.deleteLines",
-    "when": "editorTextFocus && !editorReadonly"
+    "when": "editorTextFocus && !editorReadonly",
   },
   // Move Lines (Ctrl + Up/Down - Alt-free)
   {
     "key": "ctrl+up",
     "command": "editor.action.moveLinesUpAction",
-    "when": "editorTextFocus && !editorReadonly"
+    "when": "editorTextFocus && !editorReadonly",
   },
   {
     "key": "ctrl+down",
     "command": "editor.action.moveLinesDownAction",
-    "when": "editorTextFocus && !editorReadonly"
+    "when": "editorTextFocus && !editorReadonly",
   },
   // Duplicate/Copy Lines (Ctrl + Shift + Up/Down - Alt-free)
   {
     "key": "ctrl+shift+up",
     "command": "editor.action.copyLinesUpAction",
-    "when": "editorTextFocus && !editorReadonly"
+    "when": "editorTextFocus && !editorReadonly",
   },
   {
     "key": "ctrl+shift+down",
     "command": "editor.action.copyLinesDownAction",
-    "when": "editorTextFocus && !editorReadonly"
+    "when": "editorTextFocus && !editorReadonly",
   },
   // Duplicate Selection/Line (Ctrl + Shift + d - Alt-free alternative)
   {
     "key": "ctrl+shift+d",
     "command": "editor.action.copyLinesDownAction",
-    "when": "editorTextFocus && !editorReadonly"
-  }
+    "when": "editorTextFocus && !editorReadonly",
+  },
 ]

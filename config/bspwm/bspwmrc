@@ -1,9 +1,24 @@
 #! /bin/sh
 
+# Export XDG_DATA_DIRS so rofi and other tools can find Flatpak apps
+export XDG_DATA_DIRS="/var/lib/flatpak/exports/share:$HOME/.local/share/flatpak/exports/share:/usr/local/share:/usr/share"
+
+# Force dark mode system-wide for GTK, Qt, and web-based (Electron) apps
+export GTK_THEME="Breeze-Dark"
+export QT_QPA_PLATFORMTHEME="qt5ct"
+export QT_STYLE_OVERRIDE="Breeze-Dark"
+export COLORSCHEME="dark"
+
+xrandr --output DP-0 --mode 1920x1080 --rate 144.00 --primary --pos 0x740 \
+       --output HDMI-0 --mode 2560x1080 --rate 74.99 --rotate left --pos 1920x0
+
+# Fix cursor icon turning into a cross (x) on empty space
+xsetroot -cursor_name left_ptr &
+
 pgrep -x sxhkd > /dev/null || sxhkd &
 
-bspc monitor DP-0 -d 1 2 3 4 5
-bspc monitor HDMI-0 -d 6 7 8 9
+bspc monitor DP-0 -d 1 2 3 
+bspc monitor HDMI-0 -d 4 5 6
 
 # Reset padding untuk monitor HDMI-0 karena tidak ada Polybar di sana
 bspc monitor HDMI-0 -M 0
@@ -19,20 +34,27 @@ bspc config split_ratio          0.52
 bspc config borderless_monocle   true
 bspc config gapless_monocle      true
 bspc config pointer_modifier     mod1
+bspc config pointer_follows_focus true
+
 
 bspc rule -a Gimp desktop='^8' state=floating follow=on
 bspc rule -a Chromium desktop='^2'
 bspc rule -a mplayer2 state=floating
 bspc rule -a Kupfer.py focus=on
 bspc rule -a Screenkey manage=off
+bspc rule -a Spotify state=floating rectangle=1200x720+0+0 center=on
+bspc rule -a Thunar state=floating
+bspc rule -a Rofi state=floating
+# bspc rule -a Alacritty state=floating rectangle=1000x600+0+0 center=on
+# bspc rule -a Helium state=floating
+# bspc rule -a discord state=floating rectangle=1200x720+0+0 center=on
+bspc rule -a WhatsApp state=floating rectangle=1200x720+0+0 center=on
 
 bspc config gapless_monocle false
 bspc config borderless_monocle false
 
 pkill picom
 picom --config ~/.config/picom/picom.conf &
-xrandr --output DP-0 --mode 1920x1080 --rate 144.00 --primary --pos 0x0 \
-       --output HDMI-0 --mode 2560x1080 --rate 74.99 --rotate right --pos 1920x0 &
 
 # Menjalankan Polkit Authentication Agent bawaan KDE (untuk Arch Linux: polkit-kde-agent)
 /usr/lib/polkit-kde-authentication-agent-1 &
@@ -41,8 +63,23 @@ xrandr --output DP-0 --mode 1920x1080 --rate 144.00 --primary --pos 0x0 \
 # Menjalankan background logger untuk notifikasi Polybar
 pgrep -f notification_logger.py > /dev/null || python3 ~/.local/bin/notification_logger.py &
 
+# Disable screen blanking and DPMS to prevent display from turning off during video playback
+python3 ~/.local/bin/disable_blanking.py &
+
 ~/.config/polybar/launch.sh &
 [ -f ~/.fehbg ] && sh ~/.fehbg &
 ~/.local/bin/border_focus.sh &
+~/.local/bin/sysinfo.sh &
 
+# Auto-mount partitions at startup
+udisksctl mount -b /dev/disk/by-uuid/B8CA2067CA20245A >/dev/null 2>&1 &
+udisksctl mount -b /dev/disk/by-uuid/9230BB5830BB4251 >/dev/null 2>&1 &
 
+warp-cli connect
+
+# Configure pointer settings (Flat profile, disable acceleration, and adjust speed)
+xinput set-prop "pointer:2.4G Wireless Device" "libinput Accel Profile Enabled" 0 1 0 &
+xinput set-prop "pointer:2.4G Wireless Device" "libinput Accel Speed" 0.0 &
+
+xinput set-prop "pointer:RDR Rainy 75 Mouse" "libinput Accel Profile Enabled" 0 1 0 &
+xinput set-prop "pointer:RDR Rainy 75 Mouse" "libinput Accel Speed" 0.0 &

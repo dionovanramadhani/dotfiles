@@ -3,7 +3,7 @@
 LOG_FILE="$HOME/.cache/notification_history.json"
 
 if [ ! -f "$LOG_FILE" ]; then
-    echo "No notifications" | rofi -dmenu -p "Notifications" -theme-str "window { location: southeast; anchor: southeast; x-offset: -10%; y-offset: -48px; width: 450px; }"
+    echo "No notifications" | rofi -dmenu -theme "$HOME/.config/rofi/config.rasi" -p "Notifications" -theme-str "window { location: southeast; anchor: southeast; x-offset: -10%; y-offset: -48px; width: 450px; } listview { columns: 1; }"
     exit 0
 fi
 
@@ -27,12 +27,12 @@ except Exception as e:
 ")
 
 if [ -z "$NOTIFICATIONS" ]; then
-    echo "No notifications" | rofi -dmenu -p "Notifications" -theme-str "window { location: southeast; anchor: southeast; x-offset: -10%; y-offset: -48px; width: 450px; }"
+    echo "No notifications" | rofi -dmenu -theme "$HOME/.config/rofi/config.rasi" -p "Notifications" -theme-str "window { location: southeast; anchor: southeast; x-offset: -10%; y-offset: -48px; width: 450px; } listview { columns: 1; }"
     exit 0
 fi
 
 # Show rofi menu
-choice_index=$(printf "$NOTIFICATIONS" | rofi -dmenu -i -format i -p "Notifications" -theme-str "window { location: southeast; anchor: southeast; x-offset: -10%; y-offset: -48px; width: 450px; }")
+choice_index=$(printf "$NOTIFICATIONS" | rofi -dmenu -theme "$HOME/.config/rofi/config.rasi" -i -format i -p "Notifications" -theme-str "window { location: southeast; anchor: southeast; x-offset: -10%; y-offset: -48px; width: 450px; } listview { columns: 1; }")
 
 if [ -n "$choice_index" ]; then
     # We selected an item!

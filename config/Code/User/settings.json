@@ -102,7 +102,6 @@
   "workbench.sideBar.location": "right",
   "editor.tabSize": 2,
   "prettier.printWidth": 90,
-  "editor.formatOnSave": true,
   "settingsSync.ignoredSettings": [
     "editor.fontSize",
     "terminal.integrated.fontFamily",
@@ -123,7 +122,7 @@
   "workbench.colorTheme": "Gruvbox Dark Hard",
   "discord.detailsEditing": "nguli standing...",
   "discord.removeLowerDetails": true,
-  "terminal.integrated.fontFamily": "FiraCode Nerd Font Mono",
+  "terminal.integrated.fontFamily": "JetBrainsMono Nerd Font",
   "terminal.integrated.env.linux": {},
   "git.confirmSync": false,
   "workbench.editor.empty.hint": "hidden",
@@ -303,4 +302,9 @@
   "prisma.hidePrisma6Prompts": true,
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   "diffEditor.codeLens": true,
+  "workbench.activityBar.compact": true,
+  "workbench.activityBar.location": "hidden",
+  "workbench.statusBar.visible": false,
+  "editor.formatOnSave": true,
+  "js/ts.updateImportsOnFileMove.enabled": "always",
 }

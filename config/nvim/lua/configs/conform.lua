@@ -19,8 +19,14 @@ local options = {
 
   formatters = {
     prettier = {
-      -- Memaksa menggunakan prettier dari Mason untuk menghindari error modul lokal proyek yang rusak
-      command = vim.fn.stdpath("data") .. "/mason/bin/prettier",
+      -- Memaksa menggunakan prettier dari Mason untuk menghindari error modul lokal proyek yang rusak, dengan fallback
+      command = function()
+        local mason_path = vim.fn.stdpath("data") .. "/mason/bin/prettier"
+        if vim.fn.executable(mason_path) == 1 then
+          return mason_path
+        end
+        return "prettier"
+      end,
     },
   },
 }

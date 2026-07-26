@@ -14,7 +14,7 @@ position.x = 50
 position.y = 50
 
 decorations = "None"
-opacity = 1
+opacity = 0.85
 # blur = true
 
 option_as_alt = "Both"
@@ -23,6 +23,7 @@ option_as_alt = "Both"
 size = 12
 
 [font.normal]
+family = "JetBrainsMono Nerd Font"
 style = "Bold"
 
 # [font.offset]
@@ -78,3 +79,8 @@ chars = "\u001b[1;4A"
 key = "Down"
 mods = "Alt|Shift"
 chars = "\u001b[1;4B"
+
+[[keyboard.bindings]]
+key = "Return"
+mods = "Shift"
+chars = "\u001B\r"

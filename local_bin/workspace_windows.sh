@@ -7,6 +7,11 @@ if [ -z "$WINDOWS" ]; then
     exit 0
 fi
 
+# Get the number of windows to calculate a dynamic width that keeps the layout perfectly centered
+num_wins=$(echo "$WINDOWS" | wc -l)
+# Width formula: (N * 84) + 20
+win_width=$(( num_wins * 84 + 20 ))
+
 # Run the loop to format display names and pipe to rofi, returning only the selected index (0-based)
 choice_index=$(
     for id in $WINDOWS; do
@@ -75,7 +80,7 @@ choice_index=$(
         elif [[ "$inst_lower" == *"spotify"* ]]; then
             icon_name="spotify"
         elif [[ "$inst_lower" == *"helium"* ]]; then
-            icon_name="helium"
+            icon_name="helium-browser"
         else
             icon_name="$class_lower"
             if [ -z "$icon_name" ]; then
@@ -91,7 +96,40 @@ choice_index=$(
 
         # Format: Display Name\0icon\037IconName
         printf "%s\0icon\037%s\n" "$prefix$name" "$icon_name"
-    done | rofi -dmenu -i -format i -show-icons -p "Windows"
+    done | rofi -dmenu -i -format i -show-icons \
+        -theme /home/dionovan/.config/rofi/config.rasi \
+        -theme-str '
+            window {
+                width: '"${win_width}"'px;
+                border: 0px;
+                border-radius: 0px;
+                padding: 15px;
+                background-color: @background;
+                children: [ listview ];
+            }
+            listview {
+                layout: horizontal;
+                spacing: 12px;
+                border: 0px;
+                background-color: transparent;
+            }
+            element {
+                padding: 12px;
+                border-radius: 0px;
+                background-color: transparent;
+            }
+            element selected {
+                background-color: @selected-normal-background;
+            }
+            element-icon {
+                size: 48px;
+                horizontal-align: 0.5;
+                vertical-align: 0.5;
+            }
+            element-text {
+                enabled: false;
+            }
+        ' -p "Windows"
 )
 
 # Check if a choice was made (index is a number)

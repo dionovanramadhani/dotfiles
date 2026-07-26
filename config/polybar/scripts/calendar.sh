@@ -38,9 +38,9 @@ generate_calendar() {
     local d
     for ((d=1; d<=ndim; d++)); do
         if [[ $month -eq $CURRENT_MONTH && $year -eq $CURRENT_YEAR && $d -eq $TODAY ]]; then
-            cells+=("$(printf '[%2d] ' "$d")")   # [27]  → 5 chars
+            cells+=("<span background='#fabd2f' foreground='#282828'><b>$(printf ' %2d ' "$d")</b></span> ")
         else
-            cells+=("$(printf ' %2d  ' "$d")")   # " 27 " → 5 chars
+            cells+=("$(printf ' %2d  ' "$d")")
         fi
     done
 
@@ -77,15 +77,33 @@ generate_calendar() {
 while true; do
     MENU=$(generate_calendar "$YEAR" "$MONTH")
 
+    num_lines=$(printf "%s" "$MENU" | wc -l)
+    urgent_indices="$((num_lines-3)),$((num_lines-2)),$((num_lines-1))"
+
     CHOICE=$(printf "%s" "$MENU" | rofi \
         -dmenu \
         -theme ~/.config/rofi/calendar.rasi \
         -p "" \
         -no-custom \
+        -markup-rows \
+        -a 0 \
+        -u "$urgent_indices" \
+        -selected-row "$((num_lines-3))" \
         -format s)
 
     # Match prefix baris navigasi (dimulai dengan spasi + simbol)
     case "$CHOICE" in
+        " 📅"*)
+            YEAR_INPUT=$(seq $((CURRENT_YEAR-10)) $((CURRENT_YEAR+20)) | rofi \
+                -dmenu \
+                -p "Tahun :" \
+                -theme ~/.config/rofi/calendar.rasi \
+                -theme-str 'inputbar { enabled: true; children: [ prompt, entry ]; } prompt { expand: false; margin: 0px 8px 0px 0px; } listview { lines: 8; }' \
+                -format s)
+            if [[ "$YEAR_INPUT" =~ ^[0-9]{4}$ ]]; then
+                YEAR=$YEAR_INPUT
+            fi
+            ;;
         " ◀"*)
             if [[ $MONTH -eq 1  ]]; then MONTH=12; YEAR=$((YEAR-1)); else MONTH=$((MONTH-1)); fi
             ;;

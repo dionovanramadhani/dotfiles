@@ -16,9 +16,9 @@ while IFS= read -r line; do
     name=$(echo "$line" | cut -d '|' -f 1 | xargs)
     desc=$(echo "$line" | cut -d '|' -f 2- | xargs)
     
-    prefix="   "
+    prefix="   󰕾  "
     if [ "$name" = "$DEFAULT_SINK" ]; then
-        prefix="●  "
+        prefix="●  󰕾  "
     fi
     
     MENU_LIST="$MENU_LIST\n$prefix$desc"

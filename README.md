@@ -1,11 +1,11 @@
 # BSPWM & Ricing Backup Pack (Debian -> Arch Linux)
 
-Folder ini berisi semua file konfigurasi, shortcut, custom scripts, tema, ikon, font, dan wallpaper aktif dari sistem Debian-mu saat ini. Kamu bisa memindahkan folder ini ke USB drive, disk eksternal, atau menyimpannya di cloud saat menginstal distro Arch Linux barumu.
+This folder contains all configuration files, shortcuts, custom scripts, themes, icons, fonts, and active wallpapers from your current Debian system. You can move this folder to a USB drive, external disk, or save it in the cloud when installing your new Arch Linux distribution.
 
 ---
 
-## 📂 Struktur Backup
-* **`config/`**: Berisi folder konfigurasi dari `~/.config/` untuk aplikasi desktop environment:
+## 📂 Backup Structure
+* **`config/`**: Contains configuration folders from `~/.config/` for desktop environment applications:
   * `bspwm/` (Window manager settings)
   * `sxhkd/` (Keyboard shortcuts)
   * `polybar/` (Status bar)
@@ -24,57 +24,58 @@ Folder ini berisi semua file konfigurasi, shortcut, custom scripts, tema, ikon, 
   * `calcurse/` (Calcurse calendar configuration & shortcuts)
   * `xsettingsd/` (Desktop xsettings configurations)
   * `mimeapps.list` (Default file associations)
-* **`local_bin/`**: Berisi script kustom buatanmu dari `~/.local/bin/` (seperti menu audio, alt-tab switcher, powermenu, dll.).
-* **`home/`**: Berisi dotfiles penting dari home directory-mu:
+* **`local_bin/`**: Contains your custom scripts from `~/.local/bin/` (such as audio menu, alt-tab switcher, powermenu, etc.).
+* **`home/`**: Contains important dotfiles from your home directory:
   * `.zshrc` & `.p10k.zsh` (Powerlevel10k shell styling)
   * `.Xresources` (Cursor & X11 settings)
   * `.fehbg` (Wallpaper restorer)
   * `.gtkrc-2.0` (GTK theme settings)
-* **`themes/`**: Menyimpan custom GTK themes (`Everforest-BL-MB-Dark`, `Gruvbox-BL-LB-Dark`, dll.).
-* **`icons/`**: Menyimpan custom icon packs (`Everforest-Dark`, `buuf-icons-for-plasma`).
-* **`fonts/`**: Menyimpan font kustom (`MaterialIcons`, `NerdFonts`).
-* **`wallpaper/`**: Menyimpan wallpaper aktif (`street-4.png`) berserta path aslinya agar dapat dikembalikan dengan pas.
+* **`themes/`**: Stores custom GTK themes (`Everforest-BL-MB-Dark`, `Gruvbox-BL-LB-Dark`, etc.).
+* **`icons/`**: Stores custom icon packs (`Everforest-Dark`, `buuf-icons-for-plasma`).
+* **`fonts/`**: Stores custom fonts (`MaterialIcons`, `NerdFonts`).
+* **`wallpaper/`**: Stores the active wallpaper along with its original path file `path.txt` so it can be restored to its exact location.
+* **`wallpaper-all/`**: Contains all wallpaper options available in the custom wallpaper selection menu.
 
 ---
 
-## ⚡ Cara Restore di Arch Linux
+## ⚡ How to Restore on Arch Linux
 
 ### 1. Install Dependencies
-Sebelum menjalankan restore script, pastikan kamu telah menginstal semua dependency desktop environment dan tool pendukung di Arch Linux menggunakan `pacman` dan helper AUR (seperti `yay` atau `paru`):
+Before running the restore script, ensure you have installed all desktop environment dependencies and supporting tools on Arch Linux using `pacman` and an AUR helper (such as `yay` or `paru`):
 
 ```bash
-# 1. Install tool utama via Pacman
+# 1. Install main tools via Pacman
 sudo pacman -S bspwm sxhkd polybar rofi picom alacritty cava feh zsh xclip maim xdotool calcurse thunar neovim code fastfetch neovide zed xsettingsd breeze-gtk breeze-icons breeze polkit-kde-agent
 ```
 
-### 2. Jalankan Restore Script
-Buka terminal, arahkan ke folder backup ini, lalu jalankan:
+### 2. Run the Restore Script
+Open a terminal, navigate to this backup folder, and run:
 
 ```bash
 chmod +x restore.sh
 ./restore.sh
 ```
 
-Script di atas akan secara otomatis memindahkan semua folder/file ke lokasinya masing-masing di home directory barumu (`~/.config`, `~/.local/bin`, `~/`, dll.), membetulkan hak akses executable pada script kustom, dan memperbarui font cache.
+The script will automatically move all folders/files to their respective locations in your new home directory (`~/.config`, `~/.local/bin`, `~/`, etc.), apply the correct executable permissions to the custom scripts, adjust hardcoded paths dynamically to match your new system username, and update the font cache.
 
 ---
 
-## ⚠️ Hal Penting yang Perlu Diperhatikan
+## ⚠️ Important Things to Note
 
-1. **Polkit Agent (PENTING)**:
-   * Konfigurasi `bspwmrc` di repositori ini telah diubah untuk menggunakan `polkit-kde-agent` secara default karena tersedia langsung di official repository Arch Linux.
-   * **Solusi**: Pastikan kamu memasang package `polkit-kde-agent` menggunakan Pacman di Arch Linux agar autentikasi hak akses root (misalnya untuk KDE Partition Manager atau mounting disk) berfungsi secara out-of-the-box.
+1. **Polkit Agent (IMPORTANT)**:
+   * The `bspwmrc` configuration in this repository has been updated to use `polkit-kde-agent` by default as it is directly available in the official Arch Linux repository.
+   * **Solution**: Ensure you install the `polkit-kde-agent` package using Pacman on Arch Linux so that root access authentication (such as for KDE Partition Manager or mounting disks) works out-of-the-box.
 
 2. **Web Browser (Helium)**:
-   * Folder profile Helium di `~/.config/net.imput.helium` memiliki cache sebesar ~1.2GB dan **sengaja dilewati** agar proses backup tetap ringan dan cepat.
-   * Kamu perlu menginstal Helium kembali (bisa dicari di AUR atau website resminya) dan login ulang ke WhatsApp Web/Spotify di dalamnya.
+   * The Helium profile folder in `~/.config/net.imput.helium` has a cache of ~1.2GB and was **intentionally omitted** to keep the backup lightweight and fast.
+   * You will need to reinstall Helium (available via the AUR or its official website) and log back in to WhatsApp Web/Spotify within it.
 
-3. **Wallpaper & Menu Wallpaper**:
-   * Script kustom wallpaper-mu mencari gambar di folder `/home/dionovan/Pictures/wallpaper-all`.
-   * Wallpaper aktif saat ini (`street-4.png`) telah di-restore ke folder tersebut secara otomatis. Namun, jika kamu memiliki wallpaper lain di folder `wallpaper-all` berukuran besar (total 1.3GB), pastikan kamu membackup folder `/home/dionovan/Pictures/wallpaper-all` secara manual ke harddisk/flashdisk eksternal dan menyalinnya kembali ke target.
+3. **Wallpaper & Wallpaper Menu**:
+   * Your custom wallpaper script looks for images inside the `/home/dionovan/Pictures/wallpaper-all` directory.
+   * All wallpaper selections inside the `wallpaper-all/` folder, as well as the currently active wallpaper ([wallhaven-2e2xyx.jpg](file:///home/dionovan/projects/portfolio/dotfiles/wallpaper/wallhaven-2e2xyx.jpg)), are now backed up in the repository and will be automatically restored to the target `/home/dionovan/Pictures/wallpaper-all/` folder when you run the restore script.
 
 4. **Default Shell (Zsh)**:
-   * Setelah merestore `.zshrc` dan `.p10k.zsh`, ganti default shell user-mu ke Zsh dengan menjalankan:
+   * After restoring `.zshrc` and `.p10k.zsh`, change your user's default shell to Zsh by running:
      ```bash
      chsh -s $(which zsh)
      ```

@@ -6,6 +6,8 @@ x-scheme-handler/http=helium.desktop
 x-scheme-handler/https=helium.desktop
 x-scheme-handler/about=helium.desktop
 x-scheme-handler/unknown=helium.desktop
+x-scheme-handler/postman=Postman.desktop
+x-scheme-handler/claude-cli=claude-code-url-handler.desktop
 
 [Added Associations]
 video/x-matroska=org.xfce.Parole.desktop;vlc.desktop;
@@ -16,3 +18,5 @@ x-scheme-handler/https=xfce4-web-browser.desktop;
 application/pdf=helium.desktop;libreoffice-draw.desktop;atril.desktop;librewolf.desktop;
 text/x-log=libreoffice-writer.desktop;nvim.desktop;
 application/vnd.efi.iso=xfburn.desktop;
+application/vnd.openxmlformats-officedocument.wordprocessingml.document=wps-office-wps.desktop;
+application/wps-office.docx=libreoffice-writer.desktop;

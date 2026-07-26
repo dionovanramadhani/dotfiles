@@ -19,8 +19,8 @@ super + Escape
 #
 
 # quit/restart bspwm
-super + alt + {q,r}
-	bspc {quit,wm -r}
+# super + alt + {q,r}
+# 	bspc {quit,wm -r}
 
 # close and kill
 super + {_,shift + }q
@@ -43,8 +43,12 @@ super + g
 #
 
 # set the window state
-super + {t,shift + t,s,f}
-	bspc node -t {tiled,pseudo_tiled,floating,fullscreen}
+super + {t,shift + t}
+	bspc node -t {tiled,pseudo_tiled}
+
+# set window to fullscreen
+super + shift + f
+	bspc node -t fullscreen
 
 # set the node flags
 super + ctrl + {m,x,y,z}
@@ -67,17 +71,15 @@ super + {_,shift + }{Left,Down,Up,Right}
 	bspc node -{f,s} {west,south,north,east}
 
 # focus the node for the given path jump
-super + {p,b,comma,period}
-	bspc node -f @{parent,brother,first,second}
+super + {p,comma,period}
+	bspc node -f @{parent,first,second}
 
 # focus the next/previous window in the current desktop
 super + {_,shift + }c
 	bspc node -f {next,prev}.local.!hidden.window
 
-# focus the next/previous window in monocle layout
-alt + c
-	bspc node -f next.local.!hidden.window
-alt + z
+
+super + z
 	bspc node -f prev.local.!hidden.window
 
 # Alt+Tab window switching behavior (MRU cycling)
@@ -88,27 +90,34 @@ alt + Tab
 	~/.local/bin/bspwm_alt_tab_release.sh
 
 # Show list of windows on current workspace
-alt + space
+super + d
 	~/.local/bin/workspace_windows.sh
-
-
 
 # focus the next/previous desktop in the current monitor
 super + bracket{left,right}
 	bspc desktop -f {prev,next}.local
 
 # focus the next/previous desktop in the current monitor (alt + [ / ])
-alt + bracket{left,right}
-	bspc desktop -f {prev,next}.local
+alt + z
+	bspc desktop -f prev.local
+
+alt + c
+  bspc desktop -f next.local
 
 # focus the last node/desktop
 super + {grave,Tab}
 	bspc {node,desktop} -f last
 
-# focus the older or newer node in the focus history
-super + {o,i}
+# focus the older node in the focus history
+super + ctrl + o
 	bspc wm -h off; \
-	bspc node {older,newer} -f; \
+	bspc node older -f; \
+	bspc wm -h on
+
+# focus the newer node in the focus history
+super + i
+	bspc wm -h off; \
+	bspc node newer -f; \
 	bspc wm -h on
 
 # focus or send to the given desktop
@@ -140,33 +149,35 @@ super + ctrl + shift + space
 #
 
 # expand a window by moving one of its side outward
-super + alt + {h,j,k,l}
-	bspc node -z {left -20 0,bottom 0 20,top 0 -20,right 20 0}
+# super + alt + {h,j,k,l}
+# 	bspc node -z {left -20 0,bottom 0 20,top 0 -20,right 20 0}
 
 # contract a window by moving one of its side inward
-super + alt + shift + {h,j,k,l}
-	bspc node -z {right -20 0,top 0 20,bottom 0 -20,left 20 0}
+# super + alt + shift + {h,j,k,l}
+# 	bspc node -z {right -20 0,top 0 20,bottom 0 -20,left 20 0}
 
 # move a floating window
 super + {Left,Down,Up,Right}
 	bspc node -v {-20 0,0 20,0 -20,20 0}
 
 
-# Close active window
-super + q
-	bspc window -c
+
 
 # Volume Up
 XF86AudioRaiseVolume
-    amixer -q set Master 5%+
+	pactl set-sink-volume @DEFAULT_SINK@ +5%
 
 # Volume Down
 XF86AudioLowerVolume
-    amixer -q set Master 5%-
+	pactl set-sink-volume @DEFAULT_SINK@ -5%
 
 # Mute / Unmute Volume
 XF86AudioMute
-    amixer -q set Master toggle
+	pactl set-sink-mute @DEFAULT_SINK@ toggle
+
+# Audio Device Menu (Rofi)
+super + v
+	~/.local/bin/audio_device_menu.sh
 
 # 1. Menukar posisi window aktif dengan window di arah tertentu (Swap)
 super + shift + {Left,Down,Up,Right}
@@ -184,27 +195,34 @@ super + alt + f
 super + alt + t
 	bspc node -t tiled
 
+# Merapikan/menyeimbangkan ukuran tile di desktop aktif
+super + b
+	bspc node @/ -B
+
+# Menyamakan kembali perbandingan split tile di desktop aktif
+super + shift + b
+	bspc node @/ -E
 
 # Mengubah ukuran jendela (Resize) menggunakan kombinasi Alt + Super + Panah
-alt + super + {Left,Down,Up,Right}
-	bspc node -z {left -20 0,bottom 0 20,top 0 -20,right 20 0}
+# alt + super + {Left,Down,Up,Right}
+# 	bspc node -z {left -20 0,bottom 0 20,top 0 -20,right 20 0}
 # Mengurangi ukuran jendela (Shrink) menggunakan kombinasi Alt + Super + Shift + Panah
-alt + super + shift + {Left,Down,Up,Right}
-	bspc node -z {right -20 0,top 0 20,bottom 0 -20,left 20 0}
+# alt + super + shift + {Left,Down,Up,Right}
+# 	bspc node -z {right -20 0,top 0 20,bottom 0 -20,left 20 0}
 
 
 super + x
 	~/.local/bin/powermenu.sh
 
-super + h
-  helium
+# Open custom system info card
+super + shift + i
+	~/.local/bin/sysinfo.sh
+
+alt + b
+  helium-browser
 
 alt + s
-  spotify
-
-# Open helium browser
-alt + b
-	helium
+  spotify-launcher
 
 # Close active window
 ctrl + q
@@ -220,7 +238,7 @@ alt + d
 
 # Open WhatsApp Web
 alt + w
-	helium --app=https://web.whatsapp.com
+	helium-browser --class=WhatsApp --app=https://web.whatsapp.com
 
 # Toggle window floating and tiled state
 alt + f

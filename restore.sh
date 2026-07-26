@@ -39,7 +39,7 @@ fi
 echo "Restoring custom scripts to ~/.local/bin/..."
 if [ -d "$BACKUP_DIR/local_bin" ]; then
     cp -r "$BACKUP_DIR/local_bin"/* "$TARGET_HOME/.local/bin/"
-    chmod +x "$TARGET_HOME/.local/bin"/*.sh "$TARGET_HOME/.local/bin"/*.py 2>/dev/null || true
+    find "$TARGET_HOME/.local/bin" -type f -exec chmod +x {} +
     echo " - Custom scripts restored and made executable."
 else
     echo " - No custom scripts found in backup."
@@ -48,9 +48,7 @@ fi
 # Restore Home Files
 echo "Restoring dotfiles to home directory..."
 if [ -d "$BACKUP_DIR/home" ]; then
-    cp -r "$BACKUP_DIR/home"/.??* "$TARGET_HOME/" 2>/dev/null || true
-    # Also copy non-hidden if any
-    cp -r "$BACKUP_DIR/home"/* "$TARGET_HOME/" 2>/dev/null || true
+    cp -rp "$BACKUP_DIR/home/." "$TARGET_HOME/"
     echo " - Home dotfiles successfully restored."
 else
     echo " - No home files found in backup."
@@ -88,6 +86,13 @@ echo " - Fonts successfully restored."
 
 # Restore Wallpaper
 echo "Restoring wallpaper..."
+if [ -d "$BACKUP_DIR/wallpaper-all" ]; then
+    echo "Restoring all wallpaper selection menu options..."
+    mkdir -p "$TARGET_HOME/Pictures/wallpaper-all"
+    cp -r "$BACKUP_DIR/wallpaper-all"/* "$TARGET_HOME/Pictures/wallpaper-all/"
+    echo " - Wallpaper selection menu folder successfully restored."
+fi
+
 if [ -f "$BACKUP_DIR/wallpaper/path.txt" ]; then
     WALL_PATH=$(cat "$BACKUP_DIR/wallpaper/path.txt")
     # Resolve path if it uses home
@@ -106,6 +111,52 @@ if [ -f "$BACKUP_DIR/wallpaper/path.txt" ]; then
 else
     echo " - No wallpaper path history found."
 fi
+
+# Adjust hardcoded home paths in restored files
+echo "Adjusting configuration paths for your local user..."
+find "$TARGET_HOME/.config" "$TARGET_HOME/.local/bin" "$TARGET_HOME/.zshrc" "$TARGET_HOME/.p10k.zsh" "$TARGET_HOME/.fehbg" "$TARGET_HOME/.gtkrc-2.0" "$TARGET_HOME/.Xresources" -type f 2>/dev/null | while read -r file; do
+    if [ -f "$file" ]; then
+        if grep -q "/home/dionovan" "$file" 2>/dev/null; then
+            sed -i "s|/home/dionovan|${TARGET_HOME}|g" "$file"
+        fi
+    fi
+done
+echo " - Hardcoded paths successfully customized to $TARGET_HOME."
+
+# Restore GRUB and SDDM configs (requires sudo)
+if [ -d "$BACKUP_DIR/grub" ] || [ -d "$BACKUP_DIR/sddm" ]; then
+    echo ""
+    echo "=== System Configurations (GRUB & SDDM) ==="
+    echo "This script can also restore system-wide configurations (GRUB & SDDM)."
+    echo "WARNING: This requires root privileges (sudo) and will overwrite system configuration files."
+    read -p "Do you want to restore system-wide configs? (y/N): " sys_confirm
+    if [[ "$sys_confirm" =~ ^[Yy]$ ]]; then
+        echo "Restoring GRUB configuration..."
+        if [ -f "$BACKUP_DIR/grub/grub" ]; then
+            sudo cp "$BACKUP_DIR/grub/grub" /etc/default/grub
+        fi
+        if [ -f "$BACKUP_DIR/grub/40_custom" ]; then
+            sudo cp "$BACKUP_DIR/grub/40_custom" /etc/grub.d/40_custom
+        fi
+        if [ -d "$BACKUP_DIR/grub/themes/astronaut-catppucin-1.02" ]; then
+            sudo mkdir -p /boot/grub/themes
+            sudo cp -r "$BACKUP_DIR/grub/themes/astronaut-catppucin-1.02" /boot/grub/themes/
+        fi
+        
+        echo "Restoring SDDM configuration..."
+        if [ -f "$BACKUP_DIR/sddm/sddm.conf" ]; then
+            sudo cp "$BACKUP_DIR/sddm/sddm.conf" /etc/sddm.conf
+        fi
+        if [ -d "$BACKUP_DIR/sddm/themes/pixel-night-city" ]; then
+            sudo mkdir -p /usr/share/sddm/themes
+            sudo cp -r "$BACKUP_DIR/sddm/themes/pixel-night-city" /usr/share/sddm/themes/
+        fi
+        echo " - System configurations successfully restored."
+    else
+        echo " - Skipped system configuration restoration."
+    fi
+fi
+
 
 echo ""
 echo "=== IMPORTANT NOTICE ==="

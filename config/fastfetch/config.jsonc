@@ -1,78 +1,76 @@
 {
   "$schema": "https://github.com/fastfetch-cli/fastfetch/raw/dev/doc/json_schema.json",
   "logo": {
-    "type": "auto",
-    "color": {
-      "1": "red",
-      "2": "red"
-    },
+    "type": "small",
     "padding": {
       "right": 4
     }
   },
   "display": {
+    "pipe": false,
     "separator": " 󰄾 ",
     "color": {
-      "keys": "red",
-      "title": "red"
+      "keys": "yellow",
+      "title": "yellow"
     }
   },
   "modules": [
     "title",
     {
       "type": "custom",
-      "format": "──────────────────────────────────────",
-      "color": "red"
+      "format": "{#yellow}──────────────────────────────"
     },
     {
       "type": "os",
-      "key": " OS  ",
-      "keyColor": "red"
+      "key": " OS  ",
+      "keyColor": "yellow"
     },
     {
       "type": "kernel",
       "key": "󰆍 Ker ",
-      "keyColor": "red"
+      "keyColor": "yellow"
     },
     {
       "type": "uptime",
       "key": "󰅐 Up  ",
-      "keyColor": "red"
+      "keyColor": "yellow"
     },
     {
       "type": "packages",
       "key": "󰏖 Pkg ",
-      "keyColor": "red"
+      "keyColor": "yellow"
     },
     {
       "type": "shell",
       "key": " Sh  ",
-      "keyColor": "red"
+      "keyColor": "yellow"
     },
     {
       "type": "wm",
       "key": "󰟀 WM  ",
-      "keyColor": "red"
+      "keyColor": "yellow"
     },
     {
       "type": "cpu",
       "key": "󰻠 CPU ",
-      "keyColor": "red"
+      "keyColor": "yellow",
+      "format": "{name}"
     },
     {
       "type": "gpu",
       "key": "󰍛 GPU ",
-      "keyColor": "red"
+      "keyColor": "yellow",
+      "format": "{name}"
     },
     {
       "type": "memory",
       "key": "󰘚 Mem ",
-      "keyColor": "red"
+      "keyColor": "yellow",
+      "format": "{used} / {total} ({percentage})"
     },
     {
       "type": "custom",
-      "format": "──────────────────────────────────────",
-      "color": "red"
+      "format": "{#yellow}──────────────────────────────"
     },
     "break",
     {

@@ -5,4 +5,7 @@ polybar-msg cmd quit
 
 while pgrep -u $UID -x polybar >/dev/null; do sleep 1; done
 
-polybar main
+polybar main >/dev/null 2>&1 &
+disown
+polybar secondary >/dev/null 2>&1 &
+disown

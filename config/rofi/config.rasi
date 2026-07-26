@@ -8,76 +8,145 @@ configuration {
     location: 0;
     disable-history: false;
     hide-scrollbar: true;
-    display-drun: "   Apps ";
-    display-run: "   Run ";
-    display-window: " 󰕰  Window ";
-    sidebar-mode: true;
+    display-drun: "Search :";
+    display-run: "Run :";
+    display-window: "Window :";
+    sidebar-mode: false;
 }
 
 @theme "gruvbox-dark"
 
+/* Overwrite theme colors for the modern grid layout matching the picture */
 * {
-    alternate-normal-background: @normal-background;
-    alternate-normal-foreground: @normal-foreground;
-    alternate-active-background: @active-background;
-    alternate-active-foreground: @active-foreground;
-    alternate-urgent-background: @urgent-background;
-    alternate-urgent-foreground: @urgent-foreground;
+    /* Define Gruvbox palette explicitly so we can use them */
+    gb-bg0:     #282828;
+    gb-bg0-soft:#32302f;
+    gb-bg1:     #3c3836;
+    gb-bg2:     #504945;
+    gb-bg3:     #665c54;
+    gb-fg0:     #fbf1c7;
+    gb-fg1:     #ebdbb2;
+    gb-cyan:    #8ec07c;
+    gb-blue:    #83a598;
+    gb-yellow:  #fabd2f;
+    gb-red:     #fb4934;
+    gb-gray:    #a89984;
+
+    /* Override standard rofi-gruvbox theme colors */
+    background:                  @gb-bg0;
+    background-color:            transparent;
+    foreground:                  @gb-fg1;
+    border-color:                @gb-bg3;
+    separatorcolor:              transparent;
+
+    normal-background:           transparent;
+    normal-foreground:           @gb-fg1;
+    alternate-normal-background: transparent;
+    alternate-normal-foreground: @gb-fg1;
+
+    /* We use the nice cyan/aqua color for selected item background, just like the cyan in the image */
+    selected-normal-background:  @gb-cyan;
+    selected-normal-foreground:  @gb-bg0;
+
+    active-background:           @gb-bg1;
+    active-foreground:           @gb-fg0;
+    alternate-active-background: @gb-bg1;
+    alternate-active-foreground: @gb-fg0;
+    selected-active-background:  @gb-cyan;
+    selected-active-foreground:  @gb-bg0;
+
+    urgent-background:           @gb-red;
+    urgent-foreground:           @gb-bg0;
+    alternate-urgent-background: @gb-red;
+    alternate-urgent-foreground: @gb-bg0;
+    selected-urgent-background:  @gb-red;
+    selected-urgent-foreground:  @gb-bg0;
 }
 
-/* Custom Gruvbox enhancements for a cleaner, modern look */
 window {
-    width: 600px;
-    border: 2px;
-    border-color: @border-color;
-    border-radius: 12px;
-    padding: 12px;
+    width:            750px;
+    background-color: @gb-bg0;
+    border:           0px;
+    border-radius:    0px;
+    padding:          30px;
 }
 
 mainbox {
-    spacing: 10px;
+    background-color: transparent;
+    spacing:          20px;
+    children:         [ inputbar, listview ];
 }
 
 inputbar {
-    border-radius: 6px;
-    padding: 8px 12px;
-    background-color: @alternate-normal-background;
-    children: [ prompt, entry ];
+    background-color: transparent;
+    spacing:          0px;
+    padding:          0px 0px 10px 0px;
+    text-color:       @gb-fg0;
+    children:         [ prompt, entry ];
 }
 
 prompt {
     background-color: transparent;
-    text-color: @selected-normal-foreground;
+    text-color:       @gb-fg0;
+    font:             "JetBrainsMono Nerd Font Bold 10";
+    margin:           0px 8px 0px 0px;
 }
 
 entry {
     background-color: transparent;
-    placeholder: "Search...";
-    placeholder-color: @gruvbox-dark-gray;
+    text-color:       @gb-fg0;
+    placeholder:      "";
+    placeholder-color:@gb-gray;
 }
 
 listview {
-    lines: 8;
-    columns: 1;
-    spacing: 4px;
-    scrollbar: false;
-    border: 0px;
+    background-color: transparent;
+    columns:          3;
+    lines:            5;
+    spacing:          12px;
+    scrollbar:        false;
+    border:           0px;
+    fixed-height:     true;
+    dynamic:          true;
 }
 
 element {
-    border-radius: 6px;
-    padding: 8px 12px;
+    background-color: transparent;
+    text-color:       @gb-fg1;
+    padding:          8px 12px;
+    border-radius:    0px;
+    spacing:          8px;
 }
 
 element-icon {
-    size: 24px;
-    margin: 0 10px 0 0;
+    background-color: transparent;
+    text-color:       inherit;
+    size:             20px;
 }
 
 element-text {
-    vertical-align: 0.5;
+    background-color: transparent;
+    text-color:       inherit;
+    vertical-align:   0.5;
 }
 
-mode-switcher {
-    border: 0px;
+/* Ensure selected element styling is correctly applied */
+element.selected.normal {
+    background-color: @selected-normal-background;
+    text-color:       @selected-normal-foreground;
+}
+
+element.selected.urgent {
+    background-color: @selected-urgent-background;
+    text-color:       @selected-urgent-foreground;
+}
+
+element.selected.active {
+    background-color: @selected-active-background;
+    text-color:       @selected-active-foreground;
+}
+
+element.alternate.normal {
+    background-color: transparent;
+    text-color:       @gb-fg1;
 }

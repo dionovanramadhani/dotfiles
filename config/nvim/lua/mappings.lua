@@ -8,7 +8,7 @@ local map = vim.keymap.set
 
 -- Custom function to toggle between Go to Definition and Find References
 _G.go_to_definition_or_references = function()
-  local clients = vim.lsp.get_clients({ bufnr = 0, method = "textDocument/definition" })
+  local clients = vim.lsp.get_clients { bufnr = 0, method = "textDocument/definition" }
   if vim.tbl_isempty(clients) then
     vim.lsp.buf.definition()
     return
@@ -59,28 +59,28 @@ map({ "n", "i", "v" }, "<C-n>", "<cmd>enew | startinsert<CR>", { desc = "New fil
 
 -- Close editor/buffer
 map({ "n", "i", "v" }, "<C-w>", function()
-  vim.cmd("WinBufClose")
+  vim.cmd "WinBufClose"
 end, { desc = "Close buffer", nowait = true })
 
 map({ "n", "i", "v" }, "<C-F4>", function()
-  vim.cmd("WinBufClose")
+  vim.cmd "WinBufClose"
 end, { desc = "Close buffer" })
 
 -- Switch Tab/Buffer
 map({ "n", "i", "v" }, "<C-Tab>", function()
-  vim.cmd("WinBufNext")
+  vim.cmd "WinBufNext"
 end, { desc = "Next buffer" })
 
 map({ "n", "i", "v" }, "<C-PageDown>", function()
-  vim.cmd("WinBufNext")
+  vim.cmd "WinBufNext"
 end, { desc = "Next buffer" })
 
 map({ "n", "i", "v" }, "<C-S-Tab>", function()
-  vim.cmd("WinBufPrev")
+  vim.cmd "WinBufPrev"
 end, { desc = "Previous buffer" })
 
 map({ "n", "i", "v" }, "<C-PageUp>", function()
-  vim.cmd("WinBufPrev")
+  vim.cmd "WinBufPrev"
 end, { desc = "Previous buffer" })
 
 -- Split Editor
@@ -105,11 +105,12 @@ map("n", "<C-A-S-Down>", "<cmd>WinBufMoveDown<CR>", { desc = "Move buffer down" 
 map("n", "<C-A-S-Up>", "<cmd>WinBufMoveUp<CR>", { desc = "Move buffer up" })
 map("n", "<C-A-S-Right>", "<cmd>WinBufMoveRight<CR>", { desc = "Move buffer right" })
 
-
 -- 2. Editing & Navigation
 -- Clipboard (Copy, Cut, Paste)
 map("v", "<C-c>", '"+y', { desc = "Copy selection" })
 map("v", "<C-x>", '"+d', { desc = "Cut selection" })
+map("n", "<C-c>", '"+yy', { desc = "Copy current line" })
+map("n", "<C-x>", '"+dd', { desc = "Cut current line" })
 map("n", "<C-v>", '"+p', { desc = "Paste clipboard" })
 map("v", "<C-v>", '"+p', { desc = "Paste clipboard" })
 map("i", "<C-v>", "<C-r><C-o>+", { desc = "Paste clipboard" })
@@ -138,11 +139,15 @@ map("i", "<C-Delete>", "<C-o>dw", { desc = "Delete word forward" })
 -- Select All
 map({ "n", "i", "v" }, "<C-a>", "<Esc>ggVG", { desc = "Select all" })
 
--- Line Navigation (Linux style Ctrl + Left/Right)
-map({ "n", "v" }, "<C-Left>", "^", { desc = "Go to start of line" })
-map({ "n", "v" }, "<C-Right>", "$", { desc = "Go to end of line" })
-map("i", "<C-Left>", "<Home>", { desc = "Go to start of line" })
-map("i", "<C-Right>", "<End>", { desc = "Go to end of line" })
+-- Word Navigation (Ctrl + Left/Right)
+map({ "n", "v" }, "<C-Left>", "b", { desc = "Go to previous word" })
+map({ "n", "v" }, "<C-Right>", "w", { desc = "Go to next word" })
+map("i", "<C-Left>", "<C-o>b", { desc = "Go to previous word" })
+map("i", "<C-Right>", "<C-o>w", { desc = "Go to next word" })
+
+-- Line Navigation (b to start of line, e to end of line)
+map({ "n", "v" }, "b", "^", { desc = "Go to start of line" })
+map({ "n", "v" }, "e", "$", { desc = "Go to end of line" })
 
 -- Ctrl + Enter (New line below) and Shift + Enter (Add semicolon at end of line)
 map("n", "<C-CR>", "o", { desc = "New line below" })
@@ -156,7 +161,37 @@ map("n", "<C-Down>", "<cmd>m .+1<CR>==", { desc = "Move line down" })
 map("i", "<C-Up>", "<Esc><cmd>m .-2<CR>==gi", { desc = "Move line up" })
 map("i", "<C-Down>", "<Esc><cmd>m .+1<CR>==gi", { desc = "Move line down" })
 map("v", "<C-Up>", ":m '<-2<CR>gv=gv", { desc = "Move lines up" })
-map("v", "<C-Down>", ":m '>=+1<CR>gv=gv", { desc = "Move lines down" })
+map("v", "<C-Down>", ":m '>+1<CR>gv=gv", { desc = "Move lines down" })
+
+-- Move Lines (Alt + Up/Down)
+map("n", "<A-Up>", "<cmd>m .-2<CR>==", { desc = "Move line up" })
+map("n", "<A-Down>", "<cmd>m .+1<CR>==", { desc = "Move line down" })
+map("i", "<A-Up>", "<Esc><cmd>m .-2<CR>==gi", { desc = "Move line up" })
+map("i", "<A-Down>", "<Esc><cmd>m .+1<CR>==gi", { desc = "Move line down" })
+map("v", "<A-Up>", ":m '<-2<CR>gv=gv", { desc = "Move lines up" })
+map("v", "<A-Down>", ":m '>+1<CR>gv=gv", { desc = "Move lines down" })
+
+map("n", "<M-Up>", "<cmd>m .-2<CR>==", { desc = "Move line up" })
+map("n", "<M-Down>", "<cmd>m .+1<CR>==", { desc = "Move line down" })
+map("i", "<M-Up>", "<Esc><cmd>m .-2<CR>==gi", { desc = "Move line up" })
+map("i", "<M-Down>", "<Esc><cmd>m .+1<CR>==gi", { desc = "Move line down" })
+map("v", "<M-Up>", ":m '<-2<CR>gv=gv", { desc = "Move lines up" })
+map("v", "<M-Down>", ":m '>+1<CR>gv=gv", { desc = "Move lines down" })
+
+-- Move Lines (Alt + j/k)
+map("n", "<A-j>", "<cmd>m .+1<CR>==", { desc = "Move line down" })
+map("n", "<A-k>", "<cmd>m .-2<CR>==", { desc = "Move line up" })
+map("i", "<A-j>", "<Esc><cmd>m .+1<CR>==gi", { desc = "Move line down" })
+map("i", "<A-k>", "<Esc><cmd>m .-2<CR>==gi", { desc = "Move line up" })
+map("v", "<A-j>", ":m '>+1<CR>gv=gv", { desc = "Move lines down" })
+map("v", "<A-k>", ":m '<-2<CR>gv=gv", { desc = "Move lines up" })
+
+map("n", "<M-j>", "<cmd>m .+1<CR>==", { desc = "Move line down" })
+map("n", "<M-k>", "<cmd>m .-2<CR>==", { desc = "Move line up" })
+map("i", "<M-j>", "<Esc><cmd>m .+1<CR>==gi", { desc = "Move line down" })
+map("i", "<M-k>", "<Esc><cmd>m .-2<CR>==gi", { desc = "Move line up" })
+map("v", "<M-j>", ":m '>+1<CR>gv=gv", { desc = "Move lines down" })
+map("v", "<M-k>", ":m '<-2<CR>gv=gv", { desc = "Move lines up" })
 
 -- Duplicate Lines (Ctrl + Shift + d/y - Alt-free)
 map("n", "<C-S-d>", "<cmd>t .<CR>", { desc = "Duplicate line down" })
@@ -177,7 +212,6 @@ map("n", "<S-Tab>", "<<", { desc = "Outdent line" })
 map("n", "<C-S-k>", "dd", { desc = "Delete line" })
 map("i", "<C-S-k>", "<Esc>ddi", { desc = "Delete line" })
 
-
 -- 3. Search & Replace (Telescope / Native)
 -- Quick Open / Go to file
 map({ "n", "i", "v" }, "<C-p>", "<cmd>Telescope find_files<CR>", { desc = "Search files (Quick open)" })
@@ -194,8 +228,8 @@ local function get_visual_selection()
   }
   local raw_mode = vim.fn.mode()
   local mode_type = type_map[raw_mode] or "v"
-  local s_pos = vim.fn.getpos("v")
-  local e_pos = vim.fn.getpos(".")
+  local s_pos = vim.fn.getpos "v"
+  local e_pos = vim.fn.getpos "."
   local region = vim.fn.getregion(s_pos, e_pos, { type = mode_type })
   return table.concat(region, "\n")
 end
@@ -207,9 +241,9 @@ local function search_in_file()
     text = get_visual_selection()
     vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<Esc>", true, false, true), "nx", false)
   else
-    text = vim.fn.expand("<cword>")
+    text = vim.fn.expand "<cword>"
   end
-  require("telescope.builtin").current_buffer_fuzzy_find({ default_text = text })
+  require("telescope.builtin").current_buffer_fuzzy_find { default_text = text }
 end
 
 local function search_in_project()
@@ -219,25 +253,25 @@ local function search_in_project()
     text = get_visual_selection()
     vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<Esc>", true, false, true), "nx", false)
   else
-    text = vim.fn.expand("<cword>")
+    text = vim.fn.expand "<cword>"
   end
-  require("telescope.builtin").live_grep({ default_text = text })
+  require("telescope.builtin").live_grep { default_text = text }
 end
 
 -- Find in current file
 map({ "n", "x", "s" }, "<C-f>", search_in_file, { desc = "Search in file" })
 map("i", "<C-f>", function()
-  require("telescope.builtin").current_buffer_fuzzy_find({ default_text = vim.fn.expand("<cword>") })
+  require("telescope.builtin").current_buffer_fuzzy_find { default_text = vim.fn.expand "<cword>" }
 end, { desc = "Search in file" })
 
 -- Global search (Search in project)
 map({ "n", "x", "s" }, "<C-S-f>", search_in_project, { desc = "Search in project" })
 map({ "n", "x", "s" }, "<C-S-F>", search_in_project, { desc = "Search in project" })
 map("i", "<C-S-f>", function()
-  require("telescope.builtin").live_grep({ default_text = vim.fn.expand("<cword>") })
+  require("telescope.builtin").live_grep { default_text = vim.fn.expand "<cword>" }
 end, { desc = "Search in project" })
 map("i", "<C-S-F>", function()
-  require("telescope.builtin").live_grep({ default_text = vim.fn.expand("<cword>") })
+  require("telescope.builtin").live_grep { default_text = vim.fn.expand "<cword>" }
 end, { desc = "Search in project" })
 
 map({ "n", "i", "v" }, "<A-S-f>", "<cmd>Telescope live_grep<CR>", { desc = "Search in project (Alternative)" })
@@ -247,13 +281,12 @@ map({ "n", "i", "v" }, "<A-S-F>", "<cmd>Telescope live_grep<CR>", { desc = "Sear
 map("n", "<C-h>", ":%s/", { desc = "Find and replace" })
 map("v", "<C-h>", ":s/", { desc = "Find and replace in selection" })
 
-
 -- 4. General UI & Terminal
 -- Toggle Sidebar (File explorer)
 map({ "n", "i", "v" }, "<C-b>", "<cmd>NvimTreeToggle<CR>", { desc = "Toggle file explorer" })
 
 -- Toggle Terminal (Floating)
-map({ "n", "t" }, "<A-e>", function()
+map({ "n", "i", "v", "t" }, "<C-e>", function()
   require("nvchad.term").toggle { pos = "float", id = "floatTerm" }
 end, { desc = "Toggle floating terminal" })
 
@@ -289,8 +322,8 @@ end
 
 local function toggle_comment_insert()
   local line = vim.api.nvim_get_current_line()
-  if line:match("^%s*$") then
-    toggle_comment_empty_line("i")
+  if line:match "^%s*$" then
+    toggle_comment_empty_line "i"
   else
     local keys = vim.api.nvim_replace_termcodes("<Esc>gccgi", true, false, true)
     vim.api.nvim_feedkeys(keys, "m", true)
@@ -299,8 +332,8 @@ end
 
 local function toggle_comment_normal()
   local line = vim.api.nvim_get_current_line()
-  if line:match("^%s*$") then
-    toggle_comment_empty_line("n")
+  if line:match "^%s*$" then
+    toggle_comment_empty_line "n"
   else
     vim.api.nvim_feedkeys("gcc", "m", true)
   end
@@ -328,9 +361,21 @@ map("i", "<A-Left>", "<C-o>b", { desc = "Move word backward" })
 map("i", "<A-Right>", "<C-o>w", { desc = "Move word forward" })
 
 -- LSP Navigation & Code actions
-map("n", "<F12>", function() _G.go_to_definition_or_references() end, { desc = "Go to definition or references" })
-map("n", "<C-LeftMouse>", "<LeftMouse><cmd>lua _G.go_to_definition_or_references()<CR>", { desc = "Go to definition or references" })
-map("i", "<C-LeftMouse>", "<Esc><LeftMouse><cmd>lua _G.go_to_definition_or_references()<CR>", { desc = "Go to definition or references" })
+map("n", "<F12>", function()
+  _G.go_to_definition_or_references()
+end, { desc = "Go to definition or references" })
+map(
+  "n",
+  "<C-LeftMouse>",
+  "<LeftMouse><cmd>lua _G.go_to_definition_or_references()<CR>",
+  { desc = "Go to definition or references" }
+)
+map(
+  "i",
+  "<C-LeftMouse>",
+  "<Esc><LeftMouse><cmd>lua _G.go_to_definition_or_references()<CR>",
+  { desc = "Go to definition or references" }
+)
 map("n", "<S-F12>", vim.lsp.buf.references, { desc = "Find references" })
 map({ "n", "i", "v" }, "<A-S-f>", function()
   require("conform").format { lsp_fallback = true }
@@ -346,7 +391,7 @@ local last_scroll_time = 0
 local function save_scroll_jump()
   local now = vim.uv.hrtime() / 1000000 -- Convert nanoseconds to milliseconds
   if now - last_scroll_time > 1000 then -- 1 second threshold
-    vim.cmd("normal! m'")
+    vim.cmd "normal! m'"
   end
   last_scroll_time = now
 end
@@ -378,25 +423,25 @@ local function preview_image()
 
   -- If in NvimTree
   if vim.bo.filetype == "NvimTree" then
-    local api = require("nvim-tree.api")
+    local api = require "nvim-tree.api"
     local node = api.tree.get_node_under_cursor()
     if node and node.absolute_path then
       path = node.absolute_path
     end
   else
     -- Get path under cursor
-    local cword = vim.fn.expand("<cfile>")
+    local cword = vim.fn.expand "<cfile>"
     if cword and cword ~= "" then
-      if cword:match("^/") then
+      if cword:match "^/" then
         path = cword
-      elseif cword:match("^@/") then
+      elseif cword:match "^@/" then
         local root = vim.fs.root(0, { ".git", "package.json" })
         if root then
           path = root .. "/src/" .. cword:sub(3)
         end
       else
         -- Resolve relative path relative to current buffer's directory
-        local current_dir = vim.fn.expand("%:p:h")
+        local current_dir = vim.fn.expand "%:p:h"
         path = current_dir .. "/" .. cword
       end
       if path then
@@ -407,7 +452,7 @@ local function preview_image()
 
   if path then
     -- Check if it's an image file
-    local ext = path:match("^.+(%..+)$")
+    local ext = path:match "^.+(%..+)$"
     if ext then
       ext = ext:lower()
       local valid_extensions = {
@@ -438,7 +483,11 @@ local function preview_image()
           border = "rounded",
         })
 
-        vim.fn.termopen("chafa --symbols block+braille+sextant --colors full --color-space din99d -w 9 " .. vim.fn.shellescape(path) .. " && echo '' && echo 'Press any key to close...' && read -n 1")
+        vim.fn.termopen(
+          "chafa --symbols block+braille+sextant --colors full --color-space din99d -w 9 "
+            .. vim.fn.shellescape(path)
+            .. " && echo '' && echo 'Press any key to close...' && read -n 1"
+        )
 
         vim.api.nvim_create_autocmd("TermClose", {
           buffer = buf,
@@ -452,7 +501,7 @@ local function preview_image()
     end
   end
 
-  print("No previewable image found under cursor.")
+  print "No previewable image found under cursor."
 end
 
 map("n", "<leader>p", preview_image, { desc = "Preview image under cursor / in NvimTree" })
@@ -466,8 +515,10 @@ local function toggle_antigravity_cli()
   for _, buf in ipairs(vim.api.nvim_list_bufs()) do
     if vim.api.nvim_buf_is_valid(buf) then
       local name = vim.api.nvim_buf_get_name(buf)
-      local is_running = pcall(function() return vim.bo[buf].channel > 0 end) and vim.bo[buf].channel > 0
-      if name:match("term://.*agy") and is_running then
+      local is_running = pcall(function()
+        return vim.bo[buf].channel > 0
+      end) and vim.bo[buf].channel > 0
+      if name:match "term://.*agy" and is_running then
         agy_buf = buf
         break
       end
@@ -494,9 +545,9 @@ local function toggle_antigravity_cli()
     if agy_buf and vim.api.nvim_buf_is_valid(agy_buf) then
       vim.api.nvim_set_current_buf(agy_buf)
     else
-      vim.cmd("terminal " .. vim.fn.expand("~/.local/bin/agy"))
+      vim.cmd("terminal " .. vim.fn.expand "~/.local/bin/agy" .. " --dangerously-skip-permissions")
     end
-    vim.cmd("startinsert")
+    vim.cmd "startinsert"
   end
 end
 
@@ -518,7 +569,7 @@ local function toggle_neogit()
   if neogit_win then
     vim.api.nvim_win_close(neogit_win, true)
   else
-    vim.cmd("Neogit")
+    vim.cmd "Neogit"
     local width = math.floor(vim.o.columns * 0.30)
     vim.cmd("vertical resize " .. width)
   end
@@ -533,11 +584,11 @@ map("n", "I", "3<C-y>", { desc = "Scroll viewport up" })
 
 -- Tab / Buffer Navigation (VS Code / Web Browser style)
 local function next_tab()
-  vim.cmd("WinBufNext")
+  vim.cmd "WinBufNext"
 end
 
 local function prev_tab()
-  vim.cmd("WinBufPrev")
+  vim.cmd "WinBufPrev"
 end
 
 -- 1. Ctrl + Alt + Arrow Left/Right (Linux style tab switching - insert, visual, terminal mode only to prevent normal mode window navigation conflict)
@@ -554,16 +605,16 @@ map({ "n", "i", "v", "t" }, "<C-S-Tab>", prev_tab, { desc = "Go to previous tab"
 
 -- 5. Visual Mode Wrapping (Wrap selection with brackets or quotes)
 local function wrap_selection(open_bracket, close_bracket)
-  local unnamed_val = vim.fn.getreg('"')
-  local unnamed_type = vim.fn.getregtype('"')
-  local z_val = vim.fn.getreg('z')
-  local z_type = vim.fn.getregtype('z')
+  local unnamed_val = vim.fn.getreg '"'
+  local unnamed_type = vim.fn.getregtype '"'
+  local z_val = vim.fn.getreg "z"
+  local z_type = vim.fn.getregtype "z"
 
   -- Yank current selection to register z
-  vim.cmd('normal! "zy')
+  vim.cmd 'normal! "zy'
 
-  local reg_val = vim.fn.getreg('z')
-  local reg_type = vim.fn.getregtype('z')
+  local reg_val = vim.fn.getreg "z"
+  local reg_type = vim.fn.getregtype "z"
   local new_val = ""
 
   if reg_type:sub(1, 1) == "\22" then -- Blockwise visual selection (<C-v>)
@@ -580,23 +631,40 @@ local function wrap_selection(open_bracket, close_bracket)
     new_val = open_bracket .. reg_val .. close_bracket
   end
 
-  vim.fn.setreg('z', new_val, reg_type)
+  vim.fn.setreg("z", new_val, reg_type)
   -- Paste back over selection using P (to not clobber unnamed register)
-  vim.cmd('normal! gv"zP')
+  vim.cmd 'normal! gv"zP'
 
   -- Restore original register values
   vim.fn.setreg('"', unnamed_val, unnamed_type)
-  vim.fn.setreg('z', z_val, z_type)
+  vim.fn.setreg("z", z_val, z_type)
 end
 
 -- Keymaps for wrapping in Visual Mode
-map("v", "{", function() wrap_selection("{", "}") end, { desc = "Wrap with curly brackets" })
-map("v", "}", function() wrap_selection("{", "}") end, { desc = "Wrap with curly brackets" })
-map("v", "[", function() wrap_selection("[", "]") end, { desc = "Wrap with square brackets" })
-map("v", "]", function() wrap_selection("[", "]") end, { desc = "Wrap with square brackets" })
-map("v", "(", function() wrap_selection("(", ")") end, { desc = "Wrap with parentheses" })
-map("v", ")", function() wrap_selection("(", ")") end, { desc = "Wrap with parentheses" })
-map("v", '"', function() wrap_selection('"', '"') end, { desc = "Wrap with double quotes" })
-map("v", "'", function() wrap_selection("'", "'") end, { desc = "Wrap with single quotes" })
-map("v", "`", function() wrap_selection("`", "`") end, { desc = "Wrap with backticks" })
-
+map("v", "{", function()
+  wrap_selection("{", "}")
+end, { desc = "Wrap with curly brackets" })
+map("v", "}", function()
+  wrap_selection("{", "}")
+end, { desc = "Wrap with curly brackets" })
+map("v", "[", function()
+  wrap_selection("[", "]")
+end, { desc = "Wrap with square brackets" })
+map("v", "]", function()
+  wrap_selection("[", "]")
+end, { desc = "Wrap with square brackets" })
+map("v", "(", function()
+  wrap_selection("(", ")")
+end, { desc = "Wrap with parentheses" })
+map("v", ")", function()
+  wrap_selection("(", ")")
+end, { desc = "Wrap with parentheses" })
+map("v", '"', function()
+  wrap_selection('"', '"')
+end, { desc = "Wrap with double quotes" })
+map("v", "'", function()
+  wrap_selection("'", "'")
+end, { desc = "Wrap with single quotes" })
+map("v", "`", function()
+  wrap_selection("`", "`")
+end, { desc = "Wrap with backticks" })

@@ -5,6 +5,31 @@ return {
     opts = require "configs.conform",
   },
 
+  {
+    "WhoIsSethDaniel/mason-tool-installer.nvim",
+    dependencies = { "williamboman/mason.nvim" },
+    lazy = false,
+    opts = {
+      ensure_installed = {
+        -- Formatters
+        "stylua",
+        "prettier",
+
+        -- LSPs
+        "html-lsp",
+        "css-lsp",
+        "typescript-language-server",
+        "tailwindcss-language-server",
+        "emmet-language-server",
+        "eslint-lsp",
+        "prisma-language-server",
+      },
+    },
+    config = function(_, opts)
+      require("mason-tool-installer").setup(opts)
+    end,
+  },
+
   -- These are some examples, uncomment them if you want to see them work!
   {
     "neovim/nvim-lspconfig",
@@ -142,6 +167,40 @@ return {
       conf.mapping["<CR>"] = cmp.mapping(function(fallback)
         fallback()
       end)
+
+      -- Filter out Text kind from nvim_lsp source
+      for _, source in ipairs(conf.sources or {}) do
+        if source.name == "nvim_lsp" then
+          source.entry_filter = function(entry, ctx)
+            return cmp.lsp.CompletionItemKind.Text ~= entry:get_kind()
+          end
+        end
+      end
+
+      -- Remove buffer source (plain text from current files)
+      if conf.sources then
+        local filtered_sources = {}
+        for _, source in ipairs(conf.sources) do
+          if source.name ~= "buffer" then
+            table.insert(filtered_sources, source)
+          end
+        end
+        conf.sources = filtered_sources
+      end
+
+      -- Disable completion inside comments and strings
+      conf.enabled = function()
+        local context = require("cmp.config.context")
+        -- Keep command mode completion enabled
+        if vim.api.nvim_get_mode().mode == "c" then
+          return true
+        else
+          return not context.in_treesitter_capture("comment")
+            and not context.in_syntax_group("Comment")
+            and not context.in_treesitter_capture("string")
+            and not context.in_syntax_group("String")
+        end
+      end
 
       return conf
     end,

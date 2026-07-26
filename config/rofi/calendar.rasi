@@ -1,4 +1,4 @@
-/* Rofi Calendar Theme — Gruvbox Dark */
+/* Rofi Calendar Theme — Gruvbox Dark (Flat Style) */
 
 * {
     bg0:        #282828;
@@ -20,13 +20,12 @@
 }
 
 window {
-    /* Lebar disesuaikan agar 35-char content (JetBrainsMono 10) memenuhi area */
-    width:            340px;
+    /* Lebar disesuaikan agar lebih lebar dan lega */
+    width:            420px;
     background-color: #282828;
-    border:           2px;
-    border-color:     #fabd2f;
-    border-radius:    12px;
-    padding:          0px;
+    border:           0px;
+    border-radius:    0px;
+    padding:          15px;
 }
 
 mainbox {
@@ -56,8 +55,8 @@ listview {
 element {
     background-color: transparent;
     text-color:       #ebdbb2;
-    padding:          2px 4px;
-    border-radius:    4px;
+    padding:          6px 12px;
+    border-radius:    0px;
     cursor:           default;
     orientation:      horizontal;
     spacing:          0px;
@@ -69,10 +68,11 @@ element.normal.normal {
     text-color:       #ebdbb2;
 }
 
-/* Baris yang di-hover (tapi bukan navigasi) */
+/* Baris tanggal yang di-highlight saat navigasi */
 element.selected.normal {
-    background-color: transparent;
-    text-color:       #ebdbb2;
+    background-color: #8ec07c;
+    text-color:       #282828;
+    border-radius:    0px;
 }
 
 /* Baris navigasi ◀ ▶ ⟳ */
@@ -83,16 +83,16 @@ element.normal.urgent {
 }
 
 element.selected.urgent {
-    background-color: #504945;
-    text-color:       #8ec07c;
-    border-radius:    6px;
+    background-color: #8ec07c;
+    text-color:       #282828;
+    border-radius:    0px;
 }
 
 /* Header baris (📅 bulan tahun) pakai active */
 element.normal.active {
     background-color: #3c3836;
     text-color:       #fabd2f;
-    border-radius:    8px 8px 0px 0px;
+    border-radius:    0px;
 }
 
 element.selected.active {
@@ -101,10 +101,10 @@ element.selected.active {
 }
 
 element-text {
-    background-color: transparent;
+    background-color: inherit;
     text-color:       inherit;
     vertical-align:   0.5;
-    horizontal-align: 0.0;
+    horizontal-align: 0.5;
     expand:           true;
     font:             "JetBrainsMono Nerd Font Bold 10";
     highlight:        bold;

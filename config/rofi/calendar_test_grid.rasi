@@ -1,0 +1,113 @@
+/* Rofi Calendar Theme — Gruvbox Dark (Flat Style) */
+
+* {
+    bg0:        #282828;
+    bg1:        #3c3836;
+    bg2:        #504945;
+    fg0:        #fbf1c7;
+    fg1:        #ebdbb2;
+
+    gruvyellow: #fabd2f;
+    gruvaqua:   #8ec07c;
+    gruvorange: #fe8019;
+
+    background-color: #282828;
+    text-color:       #ebdbb2;
+    border:    0;
+    margin:    0;
+    padding:   0;
+    spacing:   0;
+}
+
+window {
+    width:            320px;
+    background-color: #282828;
+    border:           0px;
+    border-radius:    0px;
+    padding:          15px;
+}
+
+mainbox {
+    background-color: transparent;
+    children:         [ inputbar, listview ];
+    padding:          0px;
+    spacing:          0px;
+}
+
+inputbar {
+    enabled:          true;
+    background-color: transparent;
+    padding:          0px 0px 15px 0px;
+    children:         [ prompt ];
+}
+
+prompt {
+    background-color: transparent;
+    text-color:       #fabd2f;
+    font:             "JetBrainsMono Nerd Font Bold 12";
+    horizontal-align: 0.5;
+    expand:           true;
+}
+
+listview {
+    background-color: transparent;
+    columns:          7;
+    lines:            8;
+    spacing:          6px;
+    scrollbar:        false;
+    border:           0px;
+    padding:          0px;
+    fixed-height:     true;
+    dynamic:          false;
+}
+
+element {
+    background-color: transparent;
+    text-color:       #ebdbb2;
+    padding:          8px 0px;
+    border-radius:    0px;
+    cursor:           pointer;
+}
+
+element.normal.normal {
+    background-color: transparent;
+    text-color:       #ebdbb2;
+}
+
+element.selected.normal {
+    background-color: #8ec07c;
+    text-color:       #282828;
+    border-radius:    0px;
+}
+
+element.normal.urgent {
+    background-color: transparent;
+    text-color:       #8ec07c;
+    cursor:           pointer;
+}
+
+element.selected.urgent {
+    background-color: #8ec07c;
+    text-color:       #282828;
+    border-radius:    0px;
+}
+
+element.normal.active {
+    background-color: transparent;
+    text-color:       #fabd2f;
+    border-radius:    0px;
+}
+
+element.selected.active {
+    background-color: #8ec07c;
+    text-color:       #282828;
+    border-radius:    0px;
+}
+
+element-text {
+    background-color: inherit;
+    text-color:       inherit;
+    vertical-align:   0.5;
+    horizontal-align: 0.5;
+    font:             "JetBrainsMono Nerd Font Bold 10";
+}

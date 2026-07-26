@@ -1,9 +1,23 @@
 #!/bin/sh
 exec tail -n +3 $0
 
+menuentry "Arch Linux (zen)" --class arch --class gnu-linux --class gnu --class os {
+    insmod part_gpt
+    insmod fat
+    search --no-floppy --fs-uuid --set=root E369-53F8
+    chainloader /EFI/Linux/arch-linux-zen.efi
+}
+
+menuentry "Arch Linux" --class arch --class gnu-linux --class gnu --class os {
+    insmod part_gpt
+    insmod fat
+    search --no-floppy --fs-uuid --set=root E369-53F8
+    chainloader /EFI/Linux/arch-linux.efi
+}
+
 menuentry "Windows 10" --class windows --class os {
-   insmod part_gpt
-   insmod fat
-   search --no-floppy --fs-uuid --set=root 4E61-5688
-   chainloader /EFI/Microsoft/Boot/bootmgfw.efi
+    insmod part_gpt
+    insmod fat
+    search --no-floppy --fs-uuid --set=root E369-53F8
+    chainloader /EFI/Microsoft/Boot/bootmgfw.efi
 }
